@@ -2,6 +2,8 @@
 const API_URL = 'http://127.0.0.1:8000';
 let guessCount = 0;
 let gameOver = false;
+let timerInterval;
+let startTime;
 
 // 將全形數字轉換為半形數字
 function convertToHalfWidth(str) {
@@ -56,11 +58,13 @@ async function makeGuess() {
         const result = await response.json();
         guessCount++;
         document.getElementById('guessCount').textContent = guessCount;
-        addToHistory(input, result.a, result.b);
+        const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+        addToHistory(input, result.a, result.b, elapsedSeconds);
 
         if (result.a === 4) {
             gameOver = true;
-            showMessage(`🎉 恭喜你！你猜對了！你總共猜了 ${guessCount} 次。`, 'success');
+            clearInterval(timerInterval);
+            showMessage(`🎉 恭喜你！你猜對了！你總共猜了 ${guessCount} 次，花了 ${elapsedSeconds} 秒。`, 'success');
         } else {
             showMessage(`結果：${result.a}A${result.b}B，繼續加油！`, 'hint');
         }
@@ -78,7 +82,7 @@ function showMessage(text, type) {
 }
 
 // 添加到歷史記錄
-function addToHistory(guess, a, b) {
+function addToHistory(guess, a, b, time) {
     const historyList = document.getElementById('historyList');
     const historyItem = document.createElement('div');
     historyItem.className = 'history-item';
@@ -88,7 +92,7 @@ function addToHistory(guess, a, b) {
 
     historyItem.innerHTML = `
         <span class="guess-number">${guess}</span>
-        <span class="result ${resultClass}">${resultText}</span>
+        <span class="result ${resultClass}">${resultText} (耗時: ${time}秒)</span>
     `;
 
     historyList.appendChild(historyItem);
@@ -104,6 +108,15 @@ async function newGame() {
         document.getElementById('guessInput').value = '';
         document.getElementById('message').innerHTML = '';
         document.getElementById('historyList').innerHTML = '';
+        
+        clearInterval(timerInterval);
+        startTime = Date.now();
+        document.getElementById('timer').textContent = '0';
+        timerInterval = setInterval(() => {
+            const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+            document.getElementById('timer').textContent = elapsedSeconds;
+        }, 1000);
+
     } catch (error) {
         showMessage('無法開始新遊戲，請檢查後端服務是否啟動。', 'error');
     }
