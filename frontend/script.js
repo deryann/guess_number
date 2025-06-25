@@ -174,19 +174,19 @@ function showMessage(text, type) {
 
 // 添加到歷史記錄
 function addToHistory(guess, a, b, time) {
-    const historyList = document.getElementById('historyList');
-    const historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
+    const historyTableBody = document.querySelector('#historyTable tbody');
+    const historyRow = document.createElement('tr');
 
     const resultText = a === 4 ? '🎉 正確！' : `${a}A${b}B`;
     const resultClass = a === 4 ? 'correct' : 'hint';
 
-    historyItem.innerHTML = `
-        <span class="guess-number">${guess}</span>
-        <span class="result ${resultClass}">${resultText} (耗時: ${time}秒)</span>
+    historyRow.innerHTML = `
+        <td class="guess-number">${guess}</td>
+        <td class="result ${resultClass}">${resultText}</td>
+        <td>${time}</td>
     `;
 
-    historyList.prepend(historyItem);
+    historyTableBody.append(historyRow);
 }
 
 // 開始新遊戲
@@ -199,7 +199,7 @@ async function newGame() {
         document.getElementById('guessCount').textContent = '0';
         document.getElementById('guessInput').value = '';
         document.getElementById('message').innerHTML = '';
-        document.getElementById('historyList').innerHTML = '';
+        document.querySelector('#historyTable tbody').innerHTML = '';
         
         clearInterval(timerInterval);
         startTime = Date.now();
