@@ -5,6 +5,7 @@ let gameOver = false;
 let timerInterval;
 let startTime;
 let playerName = "";
+let lastGameResultId = null;
 
 function startGame() {
     playerName = document.getElementById('playerName').value;
@@ -25,10 +26,19 @@ function toggleRulesModal(show) {
     modal.style.display = show ? 'block' : 'none';
 }
 
+function toggleRankingModal(show) {
+    const modal = document.getElementById('ranking-modal');
+    modal.style.display = show ? 'block' : 'none';
+}
+
 window.onclick = function(event) {
-    const modal = document.getElementById('rules-modal');
-    if (event.target == modal) {
+    const rulesModal = document.getElementById('rules-modal');
+    const rankingModal = document.getElementById('ranking-modal');
+    if (event.target == rulesModal) {
         toggleRulesModal(false);
+    }
+    if (event.target == rankingModal) {
+        toggleRankingModal(false);
     }
 }
 
@@ -91,7 +101,10 @@ async function makeGuess() {
         if (result.a === 4) {
             gameOver = true;
             clearInterval(timerInterval);
+            const endTime = new Date().toISOString();
             showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${guessCount} 次，花了 ${elapsedSeconds} 秒。`, 'success');
+            await saveScore(playerName, new Date(startTime).toISOString(), endTime, elapsedSeconds, guessCount);
+            showRanking(lastGameResultId);
         } else {
             showMessage(`結果：${result.a}A${result.b}B，繼續加油！`, 'hint');
         }
@@ -100,6 +113,57 @@ async function makeGuess() {
     }
 
     document.getElementById('guessInput').value = '';
+}
+
+async function saveScore(name, startTime, endTime, duration, guessCount) {
+    try {
+        const response = await fetch(`${API_URL}/add_score`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                name: name,
+                start_time: startTime,
+                end_time: endTime,
+                duration: duration,
+                guess_count: guessCount
+            }),
+        });
+        const result = await response.json();
+        lastGameResultId = result.id;
+    } catch (error) {
+        console.error('Failed to save score:', error);
+    }
+}
+
+async function showRanking(highlightId) {
+    try {
+        const response = await fetch(`${API_URL}/ranking`);
+        const rankingData = await response.json();
+        const rankingList = document.getElementById('ranking-list');
+        
+        let tableHtml = '<table><tr><th>排名</th><th>姓名</th><th>猜測次數</th><th>花費時間 (秒)</th></tr>';
+        rankingData.forEach((row, index) => {
+            const isCurrent = row.id === highlightId;
+            tableHtml += `<tr id="rank-${row.id}" class="${isCurrent ? 'current-player' : ''}"><td>${index + 1}</td><td>${row.name}</td><td>${row.guess_count}</td><td>${row.duration}</td></tr>`;
+        });
+        tableHtml += '</table>';
+        rankingList.innerHTML = tableHtml;
+
+        toggleRankingModal(true);
+
+        if (highlightId) {
+            const highlightRow = document.getElementById(`rank-${highlightId}`);
+            if (highlightRow) {
+                highlightRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+    } catch (error) {
+        console.error('Failed to fetch ranking:', error);
+        alert('無法獲取排行榜，請稍後再試。');
+    }
 }
 
 // 顯示訊息
@@ -131,6 +195,7 @@ async function newGame() {
         await fetch(`${API_URL}/new_game`, { method: 'POST' });
         guessCount = 0;
         gameOver = false;
+        lastGameResultId = null;
         document.getElementById('guessCount').textContent = '0';
         document.getElementById('guessInput').value = '';
         document.getElementById('message').innerHTML = '';

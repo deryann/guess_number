@@ -3,6 +3,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import random
+import sqlite3
+from datetime import datetime
 
 app = FastAPI()
 
@@ -18,7 +20,19 @@ app.add_middleware(
 class Guess(BaseModel):
     number: str
 
+class GameResult(BaseModel):
+    name: str
+    start_time: str
+    end_time: str
+    duration: float
+    guess_count: int
+
 answer = ""
+
+def get_db_connection():
+    conn = sqlite3.connect('ranking.db')
+    conn.row_factory = sqlite3.Row
+    return conn
 
 @app.post("/new_game")
 def new_game():
@@ -45,3 +59,27 @@ def make_guess(guess: Guess):
             b += 1
     
     return {"a": a, "b": b}
+
+@app.post("/add_score")
+def add_score(result: GameResult):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "INSERT INTO rankings (name, start_time, end_time, duration, guess_count) VALUES (?, ?, ?, ?, ?)",
+        (result.name, result.start_time, result.end_time, result.duration, result.guess_count)
+    )
+    conn.commit()
+    last_id = cursor.lastrowid
+    conn.close()
+    return {"id": last_id, "message": "Score added successfully."}
+
+@app.get("/ranking")
+def get_ranking():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, name, duration, guess_count FROM rankings ORDER BY guess_count ASC, duration ASC LIMIT 10"
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    return rows

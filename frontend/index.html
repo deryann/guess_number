@@ -31,6 +31,7 @@
         </div>
         <div class="game-header">
             <h1>猜數字</h1>
+            <button id="ranking-button" onclick="showRanking()">🏆</button>
             <button id="help-button" onclick="toggleRulesModal(true)">?</button>
         </div>
         <div class="game-stats">
@@ -60,6 +61,17 @@
                 <li><strong>B</strong>：數字正確但位置錯誤的個數</li>
                 <li>當你得到 <strong>4A0B</strong> 時就獲勝了！</li>
             </ul>
+        </div>
+    </div>
+
+    <!-- Ranking Modal -->
+    <div id="ranking-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="toggleRankingModal(false)">&times;</span>
+            <h2>🏆 排行榜 (TOP 10)</h2>
+            <div id="ranking-list">
+                <!-- Ranking content will be injected here -->
+            </div>
         </div>
     </div>
 
