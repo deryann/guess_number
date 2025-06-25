@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>猜數字遊戲</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎯 猜數字遊戲</h1>
+        <p class="subtitle">經典的邏輯推理遊戲</p>
+        
+        <div class="rules">
+            <h3>🎮 遊戲規則：</h3>
+            <ul>
+                <li>系統會隨機產生一個4位數字（0-9，不重複）</li>
+                <li>你需要猜出這個數字的正確順序</li>
+                <li><strong>A</strong>：數字和位置都正確的個數</li>
+                <li><strong>B</strong>：數字正確但位置錯誤的個數</li>
+                <li>當你得到 <strong>4A0B</strong> 時就獲勝了！</li>
+            </ul>
+        </div>
+        
+        <div class="game-stats">
+            <p><strong>目前猜測次數：</strong> <span id="guessCount">0</span></p>
+        </div>
+        
+        <div class="input-section">
+            <input type="text" id="guessInput" placeholder="輸入4位數字 (支援全形/半形)" maxlength="4">
+            <br>
+            <button onclick="makeGuess()">猜測</button>
+            <button onclick="newGame()">新遊戲</button>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div class="history">
+            <h3>🕐 猜測記錄：</h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,156 @@
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+.game-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+h1 {
+    color: #5a67d8;
+    margin-bottom: 10px;
+    font-size: 2.5em;
+}
+
+.subtitle {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.rules {
+    background: #f7fafc;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 30px;
+    text-align: left;
+    border-left: 4px solid #5a67d8;
+}
+
+.rules h3 {
+    color: #5a67d8;
+    margin-top: 0;
+}
+
+.input-section {
+    margin: 30px 0;
+}
+
+input {
+    font-size: 1.5em;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    width: 200px;
+    text-align: center;
+    margin: 10px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #5a67d8;
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+}
+
+button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+button:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.history {
+    margin-top: 30px;
+    text-align: left;
+}
+
+.history-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-left: 4px solid #e2e8f0;
+}
+
+.guess-number {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #2d3748;
+}
+
+.result {
+    font-weight: bold;
+}
+
+.result.correct {
+    color: #38a169;
+}
+
+.result.hint {
+    color: #d69e2e;
+}
+
+.game-stats {
+    background: #edf2f7;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.success-message {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    animation: celebration 0.6s ease-out;
+}
+
+@keyframes celebration {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.error-message {
+    color: #e53e3e;
+    background: #fed7d7;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
