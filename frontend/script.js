@@ -4,6 +4,33 @@ let guessCount = 0;
 let gameOver = false;
 let timerInterval;
 let startTime;
+let playerName = "";
+
+function startGame() {
+    playerName = document.getElementById('playerName').value;
+    if (!playerName) {
+        alert('請輸入您的姓名！');
+        return;
+    }
+
+    document.getElementById('start-screen').style.display = 'none';
+    document.querySelector('.game-container').style.display = 'block';
+    document.getElementById('playerNameDisplay').textContent = playerName;
+
+    newGame();
+}
+
+function toggleRulesModal(show) {
+    const modal = document.getElementById('rules-modal');
+    modal.style.display = show ? 'block' : 'none';
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('rules-modal');
+    if (event.target == modal) {
+        toggleRulesModal(false);
+    }
+}
 
 // 將全形數字轉換為半形數字
 function convertToHalfWidth(str) {
@@ -64,7 +91,7 @@ async function makeGuess() {
         if (result.a === 4) {
             gameOver = true;
             clearInterval(timerInterval);
-            showMessage(`🎉 恭喜你！你猜對了！你總共猜了 ${guessCount} 次，花了 ${elapsedSeconds} 秒。`, 'success');
+            showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${guessCount} 次，花了 ${elapsedSeconds} 秒。`, 'success');
         } else {
             showMessage(`結果：${result.a}A${result.b}B，繼續加油！`, 'hint');
         }
@@ -95,7 +122,7 @@ function addToHistory(guess, a, b, time) {
         <span class="result ${resultClass}">${resultText} (耗時: ${time}秒)</span>
     `;
 
-    historyList.appendChild(historyItem);
+    historyList.prepend(historyItem);
 }
 
 // 開始新遊戲
@@ -129,5 +156,3 @@ document.getElementById('guessInput').addEventListener('keypress', function(e) {
     }
 });
 
-// 開始遊戲
-window.onload = newGame;

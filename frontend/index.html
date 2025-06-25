@@ -8,10 +8,9 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="game-container">
+    <div id="start-screen">
         <h1>🎯 猜數字遊戲</h1>
         <p class="subtitle">經典的邏輯推理遊戲</p>
-        
         <div class="rules">
             <h3>🎮 遊戲規則：</h3>
             <ul>
@@ -22,8 +21,20 @@
                 <li>當你得到 <strong>4A0B</strong> 時就獲勝了！</li>
             </ul>
         </div>
-        
+        <input type="text" id="playerName" placeholder="請輸入您的姓名">
+        <button onclick="startGame()">開始遊戲</button>
+    </div>
+
+    <div class="game-container" style="display: none;">
+        <div class="history">
+            <div id="historyList"></div>
+        </div>
+        <div class="game-header">
+            <h1>猜數字</h1>
+            <button id="help-button" onclick="toggleRulesModal(true)">?</button>
+        </div>
         <div class="game-stats">
+            <p><strong>玩家：</strong><span id="playerNameDisplay"></span></p>
             <p><strong>目前猜測次數：</strong> <span id="guessCount">0</span></p>
             <p><strong>經過時間：</strong> <span id="timer">0</span> 秒</p>
         </div>
@@ -36,10 +47,19 @@
         </div>
         
         <div id="message"></div>
-        
-        <div class="history">
-            <h3>🕐 猜測記錄：</h3>
-            <div id="historyList"></div>
+    </div>
+
+    <div id="rules-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button" onclick="toggleRulesModal(false)">&times;</span>
+            <h3>🎮 遊戲規則：</h3>
+            <ul>
+                <li>系統會隨機產生一個4位數字（0-9，不重複）</li>
+                <li>你需要猜出這個數字的正確順序</li>
+                <li><strong>A</strong>：數字和位置都正確的個數</li>
+                <li><strong>B</strong>：數字正確但位置錯誤的個數</li>
+                <li>當你得到 <strong>4A0B</strong> 時就獲勝了！</li>
+            </ul>
         </div>
     </div>
 
