@@ -133,6 +133,9 @@ button:disabled {
     border-radius: 10px;
     padding: 20px;
     margin: 20px 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
 }
 
 .success-message {
