@@ -7,8 +7,8 @@ conn = sqlite3.connect('ranking.db')
 # Create a cursor object
 cursor = conn.cursor()
 
-# SQL statement to create the table
-create_table_sql = """
+# SQL statements to create the tables
+create_rankings_table_sql = """
 CREATE TABLE IF NOT EXISTS rankings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
@@ -19,10 +19,35 @@ CREATE TABLE IF NOT EXISTS rankings (
 );
 """
 
-# Execute the SQL statement
-cursor.execute(create_table_sql)
+create_games_table_sql = """
+CREATE TABLE IF NOT EXISTS games (
+    game_id TEXT PRIMARY KEY,
+    answer TEXT NOT NULL,
+    start_time TEXT NOT NULL,
+    player_name TEXT,
+    is_completed BOOLEAN DEFAULT FALSE,
+    completed_time TEXT
+);
+"""
 
-print("Database and table 'rankings' created successfully.")
+create_game_history_table_sql = """
+CREATE TABLE IF NOT EXISTS game_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    game_id TEXT NOT NULL,
+    guess_number TEXT NOT NULL,
+    result_a INTEGER NOT NULL,
+    result_b INTEGER NOT NULL,
+    guess_time TEXT NOT NULL,
+    FOREIGN KEY (game_id) REFERENCES games (game_id)
+);
+"""
+
+# Execute the SQL statements
+cursor.execute(create_rankings_table_sql)
+cursor.execute(create_games_table_sql)
+cursor.execute(create_game_history_table_sql)
+
+print("Database and tables 'rankings', 'games', and 'game_history' created successfully.")
 
 # Commit the changes and close the connection
 conn.commit()
