@@ -6,6 +6,7 @@ let timerInterval;
 let startTime;
 let playerName = "";
 let lastGameResultId = null;
+let currentGameId = null;  // Store the current game UUID
 
 function startGame() {
     playerName = document.getElementById('playerName').value;
@@ -69,6 +70,11 @@ function validateInput(input) {
 // 進行猜測
 async function makeGuess() {
     if (gameOver) return;
+    
+    if (!currentGameId) {
+        showMessage('請先開始新遊戲。', 'error');
+        return;
+    }
 
     let input = document.getElementById('guessInput').value;
     input = convertToHalfWidth(input);
@@ -85,7 +91,10 @@ async function makeGuess() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ number: input }),
+            body: JSON.stringify({ 
+                game_id: currentGameId,
+                number: input 
+            }),
         });
 
         if (!response.ok) {
@@ -98,12 +107,11 @@ async function makeGuess() {
         const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
         addToHistory(input, result.a, result.b, elapsedSeconds);
 
-        if (result.a === 4) {
+        if (result.game_completed) {
             gameOver = true;
             clearInterval(timerInterval);
-            const endTime = new Date().toISOString();
-            showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${guessCount} 次，花了 ${elapsedSeconds} 秒。`, 'success');
-            await saveScore(playerName, new Date(startTime).toISOString(), endTime, elapsedSeconds, guessCount);
+            lastGameResultId = result.ranking_id;
+            showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${result.guess_count} 次，花了 ${Math.round(result.duration)} 秒。`, 'success');
             showRanking(lastGameResultId);
         } else {
             showMessage(`結果：${result.a}A${result.b}B，繼續加油！`, 'hint');
@@ -115,6 +123,8 @@ async function makeGuess() {
     document.getElementById('guessInput').value = '';
 }
 
+// Note: This function is kept for backward compatibility but is no longer used
+// The backend now automatically handles score saving when the game is completed
 async function saveScore(name, startTime, endTime, duration, guessCount) {
     try {
         const response = await fetch(`${API_URL}/add_score`, {
@@ -192,7 +202,21 @@ function addToHistory(guess, a, b, time) {
 // 開始新遊戲
 async function newGame() {
     try {
-        await fetch(`${API_URL}/new_game`, { method: 'POST' });
+        const response = await fetch(`${API_URL}/new_game`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ player_name: playerName }),
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const result = await response.json();
+        currentGameId = result.game_id;  // Store the game UUID
+        
         guessCount = 0;
         gameOver = false;
         lastGameResultId = null;

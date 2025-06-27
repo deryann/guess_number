@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import random
 import sqlite3
+import uuid
 from datetime import datetime
 
 app = FastAPI()
@@ -18,7 +19,11 @@ app.add_middleware(
 )
 
 class Guess(BaseModel):
+    game_id: str
     number: str
+
+class NewGameRequest(BaseModel):
+    player_name: str
 
 class GameResult(BaseModel):
     name: str
@@ -27,6 +32,7 @@ class GameResult(BaseModel):
     duration: float
     guess_count: int
 
+# Global answer variable kept for backward compatibility but not used in UUID system
 answer = ""
 
 def get_db_connection():
@@ -35,21 +41,53 @@ def get_db_connection():
     return conn
 
 @app.post("/new_game")
-def new_game():
-    global answer
+def new_game(request: NewGameRequest):
+    # Generate a unique game ID
+    game_id = str(uuid.uuid4())
+    
+    # Generate a random 4-digit answer
     digits = [str(i) for i in range(10)]
     random.shuffle(digits)
     answer = "".join(digits[:4])
-    print(answer)
-    return {"message": "New game started."}
+    
+    # Store game session in database
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    start_time = datetime.now().isoformat()
+    
+    cursor.execute(
+        "INSERT INTO games (game_id, answer, start_time, player_name) VALUES (?, ?, ?, ?)",
+        (game_id, answer, start_time, request.player_name)
+    )
+    conn.commit()
+    conn.close()
+    
+    print(f"New game {game_id}: {answer}")  # For debugging
+    return {"game_id": game_id, "message": "New game started."}
 
 @app.post("/guess")
 def make_guess(guess: Guess):
-    global answer
-    if not answer:
-        raise HTTPException(status_code=400, detail="Please start a new game first.")
-
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get game session
+    cursor.execute("SELECT answer, player_name, start_time, is_completed FROM games WHERE game_id = ?", (guess.game_id,))
+    game_row = cursor.fetchone()
+    
+    if not game_row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Game not found.")
+    
+    if game_row[3]:  # is_completed
+        conn.close()
+        raise HTTPException(status_code=400, detail="Game already completed.")
+    
+    answer = game_row[0]
+    player_name = game_row[1] 
+    start_time = game_row[2]
     user_guess = guess.number
+    
+    # Calculate A and B
     a = 0
     b = 0
     for i in range(4):
@@ -58,7 +96,51 @@ def make_guess(guess: Guess):
         elif user_guess[i] in answer:
             b += 1
     
-    return {"a": a, "b": b}
+    # Record guess in game history
+    guess_time = datetime.now().isoformat()
+    cursor.execute(
+        "INSERT INTO game_history (game_id, guess_number, result_a, result_b, guess_time) VALUES (?, ?, ?, ?, ?)",
+        (guess.game_id, user_guess, a, b, guess_time)
+    )
+    
+    response_data = {"a": a, "b": b}
+    
+    # Check if game is won (4A)
+    if a == 4:
+        # Mark game as completed
+        cursor.execute(
+            "UPDATE games SET is_completed = TRUE, completed_time = ? WHERE game_id = ?",
+            (guess_time, guess.game_id)
+        )
+        
+        # Calculate game statistics
+        cursor.execute(
+            "SELECT COUNT(*) FROM game_history WHERE game_id = ?",
+            (guess.game_id,)
+        )
+        guess_count = cursor.fetchone()[0]
+        
+        # Calculate duration
+        start_datetime = datetime.fromisoformat(start_time)
+        end_datetime = datetime.fromisoformat(guess_time)
+        duration = (end_datetime - start_datetime).total_seconds()
+        
+        # Add to rankings
+        cursor.execute(
+            "INSERT INTO rankings (name, start_time, end_time, duration, guess_count) VALUES (?, ?, ?, ?, ?)",
+            (player_name, start_time, guess_time, duration, guess_count)
+        )
+        
+        ranking_id = cursor.lastrowid
+        response_data["game_completed"] = True
+        response_data["ranking_id"] = ranking_id
+        response_data["guess_count"] = guess_count
+        response_data["duration"] = duration
+    
+    conn.commit()
+    conn.close()
+    
+    return response_data
 
 @app.post("/add_score")
 def add_score(result: GameResult):
