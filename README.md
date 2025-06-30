@@ -2,6 +2,9 @@
 
 這是一個經典的猜數字 (4A0B) 網頁遊戲，前端使用純 HTML/CSS/JavaScript 打造，後端則由 Python FastAPI 驅動，並使用 SQLite 資料庫來記錄玩家的排行榜。
 
+## Online docker connector
+- https://guess-number-ywjn.onrender.com/
+
 ## ✨ 主要功能
 
 - **經典 4A0B 玩法**: 系統隨機產生一組不重複的四位數字，玩家需要猜出正確的數字與位置。
@@ -41,11 +44,6 @@
 這是最簡單快速的部署方式，使用 Docker 來建置和運行整個應用程式。
 
 **1. 使用自動化 Build Script:**
-
-在 Windows 系統上：
-```bash
-.\start_build.bat
-```
 
 在 Linux/macOS 系統上：
 ```bash
