@@ -1,5 +1,5 @@
-
-const API_URL = 'http://127.0.0.1:8000';
+// 動態檢測 API URL，自動適應當前環境
+const API_URL = window.location.origin;
 let guessCount = 0;
 let gameOver = false;
 let timerInterval;
@@ -7,6 +7,30 @@ let startTime;
 let playerName = "";
 let lastGameResultId = null;
 let currentGameId = null;  // Store the current game UUID
+let currentTableIndex = 0;  // 當前表格索引
+const ROWS_PER_TABLE = 5;   // 每個表格最多顯示的行數
+
+// Load version information when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadVersionInfo();
+});
+
+async function loadVersionInfo() {
+    try {
+        const response = await fetch(`${API_URL}/version`);
+        if (response.ok) {
+            const versionData = await response.json();
+            const versionDisplay = document.getElementById('version-display');
+            versionDisplay.textContent = `${versionData.main_version}.${versionData.minor_version}`;
+        } else {
+            console.error('Failed to load version info');
+            document.getElementById('version-display').textContent = 'dev.dev';
+        }
+    } catch (error) {
+        console.error('Error loading version info:', error);
+        document.getElementById('version-display').textContent = 'dev.dev';
+    }
+}
 
 function startGame() {
     playerName = document.getElementById('playerName').value;
@@ -176,15 +200,65 @@ async function showRanking(highlightId) {
     }
 }
 
+// 創建新的歷史表格
+function createNewHistoryTable(tableIndex) {
+    const historyContainer = document.getElementById('historyContainer');
+    
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'history-table-container';
+    tableContainer.id = `table-container-${tableIndex}`;
+    
+    const tableTitle = document.createElement('h4');
+    const startGuess = tableIndex * ROWS_PER_TABLE + 1;
+    const endGuess = (tableIndex + 1) * ROWS_PER_TABLE;
+    tableTitle.textContent = `猜測 ${startGuess}-${endGuess}`;
+    
+    const table = document.createElement('table');
+    table.className = 'historyTable';
+    table.id = `historyTable-${tableIndex}`;
+    
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>猜測</th>
+                <th>結果</th>
+                <th>時間(秒)</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    `;
+    
+    tableContainer.appendChild(tableTitle);
+    tableContainer.appendChild(table);
+    historyContainer.appendChild(tableContainer);
+    
+    return table;
+}
+
+// 取得當前應該使用的表格
+function getCurrentHistoryTable() {
+    const tableIndex = Math.floor((guessCount - 1) / ROWS_PER_TABLE);
+    let table = document.getElementById(`historyTable-${tableIndex}`);
+    
+    if (!table) {
+        table = createNewHistoryTable(tableIndex);
+        currentTableIndex = tableIndex;
+    }
+    
+    return table;
+}
+
 // 顯示訊息
 function showMessage(text, type) {
     const messageDiv = document.getElementById('message');
     messageDiv.innerHTML = `<div class="${type === 'success' ? 'success-message' : type === 'error' ? 'error-message' : 'hint'}">${text}</div>`;
 }
 
-// 添加到歷史記錄
+// 添加到歷史記錄 - 修改版本支援多表格
 function addToHistory(guess, a, b, time) {
-    const historyTableBody = document.querySelector('#historyTable tbody');
+    const currentTable = getCurrentHistoryTable();
+    const historyTableBody = currentTable.querySelector('tbody');
     const historyRow = document.createElement('tr');
 
     const resultText = a === 4 ? '🎉 正確！' : `${a}A${b}B`;
@@ -196,7 +270,20 @@ function addToHistory(guess, a, b, time) {
         <td>${time}</td>
     `;
 
-    historyTableBody.append(historyRow);
+    historyTableBody.appendChild(historyRow);
+    
+    // 滾動到最新的表格
+    const tableContainer = currentTable.closest('.history-table-container');
+    if (tableContainer) {
+        tableContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+// 清除所有歷史記錄表格
+function clearAllHistoryTables() {
+    const historyContainer = document.getElementById('historyContainer');
+    historyContainer.innerHTML = '';
+    currentTableIndex = 0;
 }
 
 // 開始新遊戲
@@ -220,10 +307,11 @@ async function newGame() {
         guessCount = 0;
         gameOver = false;
         lastGameResultId = null;
+        currentTableIndex = 0;
         document.getElementById('guessCount').textContent = '0';
         document.getElementById('guessInput').value = '';
         document.getElementById('message').innerHTML = '';
-        document.querySelector('#historyTable tbody').innerHTML = '';
+        clearAllHistoryTables(); // 清除所有歷史表格
         
         clearInterval(timerInterval);
         startTime = Date.now();

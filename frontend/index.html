@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>猜數字遊戲</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div id="start-screen">
@@ -36,19 +36,8 @@
             <span><strong>目前猜測次數：</strong> <span id="guessCount">0</span></span>
             <span><strong>經過時間：</strong> <span id="timer">0</span> 秒</span>
         </div>
-        <div class="history">
-            <table id="historyTable">
-                <thead>
-                    <tr>
-                        <th>猜測</th>
-                        <th>結果</th>
-                        <th>時間(秒)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- History rows will be injected here -->
-                </tbody>
-            </table>
+        <div class="history" id="historyContainer">
+            <!-- 多個表格將動態產生在這裡 -->
         </div>
         <div class="input-section">
             <input type="text" id="guessInput" placeholder="輸入4位數字 (支援全形/半形)" maxlength="4">
@@ -84,6 +73,13 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Footer with version information -->
+    <footer id="version-footer">
+        <div class="version-info">
+            版本: <span id="version-display">載入中...</span>
+        </div>
+    </footer>
+
+    <script src="/static/script.js"></script>
 </body>
 </html>
