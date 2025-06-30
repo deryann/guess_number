@@ -36,19 +36,8 @@
             <span><strong>目前猜測次數：</strong> <span id="guessCount">0</span></span>
             <span><strong>經過時間：</strong> <span id="timer">0</span> 秒</span>
         </div>
-        <div class="history">
-            <table id="historyTable">
-                <thead>
-                    <tr>
-                        <th>猜測</th>
-                        <th>結果</th>
-                        <th>時間(秒)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- History rows will be injected here -->
-                </tbody>
-            </table>
+        <div class="history" id="historyContainer">
+            <!-- 多個表格將動態產生在這裡 -->
         </div>
         <div class="input-section">
             <input type="text" id="guessInput" placeholder="輸入4位數字 (支援全形/半形)" maxlength="4">

@@ -7,7 +7,7 @@ body {
     justify-content: center;
     align-items: center;
     color: #333;
-    padding-bottom: 40px; /* Added padding to prevent footer overlap */
+    padding: 20px 20px 60px 20px; /* Added padding to prevent footer overlap */
 }
 
 .game-container, #start-screen {
@@ -15,9 +15,13 @@ body {
     border-radius: 20px;
     padding: 40px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    max-width: 500px;
     width: 90%;
+    max-width: 1400px; /* 增加最大寬度以支援寬版 */
     text-align: center;
+}
+
+#start-screen {
+    max-width: 500px; /* 保持開始畫面的原始寬度 */
 }
 
 h1 {
@@ -92,25 +96,64 @@ button:disabled {
 }
 
 .history {
-    max-height: 200px; /* Or any height you prefer */
-    overflow-y: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: flex-start;
     padding-bottom: 20px;
     margin-bottom: 20px;
+    max-height: 400px; /* 增加高度以容納多個表格 */
+    overflow-y: auto;
 }
 
-#historyTable {
+.history-table-container {
+    flex: 0 0 300px; /* 每個表格固定寬度 */
+    min-width: 280px;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.history-table-container h4 {
+    margin: 0 0 10px 0;
+    color: #5a67d8;
+    font-size: 1em;
+    text-align: center;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 6px;
+    border-left: 4px solid #5a67d8;
+    font-weight: 600;
+}
+
+.historyTable {
     width: 100%;
     border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-#historyTable th, #historyTable td {
+.historyTable th, .historyTable td {
     border: 1px solid #ddd;
     padding: 8px 12px;
     text-align: center;
 }
 
-#historyTable th {
-    background-color: #f2f2f2;
+.historyTable th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
     position: sticky;
     top: 0;
 }
@@ -141,6 +184,67 @@ button:disabled {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    flex-wrap: wrap; /* 允許在小螢幕上換行 */
+    gap: 10px;
+}
+
+.game-stats span {
+    font-size: 1.1em;
+    color: #2d3748;
+}
+
+/* 響應式設計 */
+@media (max-width: 1200px) {
+    .history-table-container {
+        flex: 0 0 280px;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        padding: 20px;
+        max-width: 95%;
+    }
+    
+    .history {
+        flex-direction: column;
+        align-items: center;
+        max-height: 300px;
+    }
+    
+    .history-table-container {
+        flex: 1 1 100%;
+        max-width: 400px;
+        margin-bottom: 15px;
+    }
+    
+    .game-stats {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .game-stats span {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        padding: 15px;
+    }
+    
+    .history-table-container {
+        max-width: 100%;
+    }
+    
+    .historyTable th, .historyTable td {
+        padding: 6px 8px;
+        font-size: 0.9em;
+    }
+    
+    h1 {
+        font-size: 2em;
+    }
 }
 
 .success-message {
@@ -283,4 +387,48 @@ button:disabled {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
+}
+
+/* 多表格特定樣式 */
+.history-table-container {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.historyTable tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.historyTable tbody tr:hover {
+    background-color: #e3f2fd;
+    transition: background-color 0.2s ease;
+}
+
+/* 滾動條美化 */
+.history::-webkit-scrollbar {
+    height: 8px;
+}
+
+.history::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.history::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.history::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
 }
