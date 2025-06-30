@@ -7,6 +7,7 @@ body {
     justify-content: center;
     align-items: center;
     color: #333;
+    padding-bottom: 40px; /* Added padding to prevent footer overlap */
 }
 
 .game-container, #start-screen {
@@ -260,4 +261,26 @@ button:disabled {
     padding: 0;
     line-height: 40px;
     text-align: center;
+}
+
+/* Footer styles */
+#version-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid #e2e8f0;
+    padding: 8px 0;
+    text-align: center;
+    font-size: 0.8em;
+    color: #666;
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+}
+
+.version-info {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }

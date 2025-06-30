@@ -1,4 +1,3 @@
-
 const API_URL = 'http://127.0.0.1:8000';
 let guessCount = 0;
 let gameOver = false;
@@ -7,6 +6,28 @@ let startTime;
 let playerName = "";
 let lastGameResultId = null;
 let currentGameId = null;  // Store the current game UUID
+
+// Load version information when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    loadVersionInfo();
+});
+
+async function loadVersionInfo() {
+    try {
+        const response = await fetch(`${API_URL}/version`);
+        if (response.ok) {
+            const versionData = await response.json();
+            const versionDisplay = document.getElementById('version-display');
+            versionDisplay.textContent = `${versionData.main_version}.${versionData.minor_version}`;
+        } else {
+            console.error('Failed to load version info');
+            document.getElementById('version-display').textContent = 'dev.dev';
+        }
+    } catch (error) {
+        console.error('Error loading version info:', error);
+        document.getElementById('version-display').textContent = 'dev.dev';
+    }
+}
 
 function startGame() {
     playerName = document.getElementById('playerName').value;

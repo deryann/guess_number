@@ -1,10 +1,11 @@
-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import random
 import sqlite3
 import uuid
+import os
 from datetime import datetime
 
 app = FastAPI()
@@ -34,6 +35,19 @@ class GameResult(BaseModel):
 
 # Global answer variable kept for backward compatibility but not used in UUID system
 answer = ""
+
+# Mount static files for frontend
+app.mount("/static", StaticFiles(directory="../frontend"), name="static")
+
+@app.get("/")
+def read_root():
+    """Serve the main HTML page"""
+    from fastapi.responses import FileResponse
+    return FileResponse("../frontend/index.html")
+
+# Version information from environment variables
+MAIN_VERSION = os.getenv("MAIN_VERSION", "dev")
+MINOR_VERSION = os.getenv("MINOR_VERSION", "dev")
 
 def get_db_connection():
     conn = sqlite3.connect('ranking.db')
@@ -165,3 +179,12 @@ def get_ranking():
     rows = cursor.fetchall()
     conn.close()
     return rows
+
+@app.get("/version")
+def get_version():
+    """Get application version information"""
+    return {
+        "main_version": MAIN_VERSION,
+        "minor_version": MINOR_VERSION,
+        "version": f"{MAIN_VERSION}.{MINOR_VERSION}"
+    }
