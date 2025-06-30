@@ -1,4 +1,5 @@
-const API_URL = 'http://127.0.0.1:8000';
+// 動態檢測 API URL，自動適應當前環境
+const API_URL = window.location.origin;
 let guessCount = 0;
 let gameOver = false;
 let timerInterval;
