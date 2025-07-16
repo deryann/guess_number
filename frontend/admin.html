@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理員後台 - 猜數字遊戲</title>
+    <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+    <!-- 登入頁面 -->
+    <div id="login-container">
+        <div class="login-card">
+            <h1>🔐 管理員登入</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">帳號:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密碼:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">登入</button>
+            </form>
+            <div id="loginMessage"></div>
+            <div class="back-link">
+                <a href="/">← 回到主頁面</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 管理員後台 -->
+    <div id="admin-container" style="display: none;">
+        <div class="admin-header">
+            <h1>🎯 排名榜管理</h1>
+            <div class="admin-controls">
+                <button id="refreshBtn" onclick="loadRankings()">🔄 重新整理</button>
+                <button id="logoutBtn" onclick="logout()">🚪 登出</button>
+            </div>
+        </div>
+
+        <div class="admin-content">
+            <div class="rankings-section">
+                <h2>排名記錄</h2>
+                <div id="rankingsContainer">
+                    <table id="rankingsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>玩家姓名</th>
+                                <th>開始時間</th>
+                                <th>結束時間</th>
+                                <th>遊戲時長(秒)</th>
+                                <th>猜測次數</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rankingsTableBody">
+                            <!-- 排名資料將動態載入 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 編輯對話框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h3>編輯排名記錄</h3>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editName">玩家姓名:</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editStartTime">開始時間:</label>
+                    <input type="datetime-local" id="editStartTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEndTime">結束時間:</label>
+                    <input type="datetime-local" id="editEndTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="editDuration">遊戲時長(秒):</label>
+                    <input type="number" id="editDuration" step="0.1" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="editGuessCount">猜測次數:</label>
+                    <input type="number" id="editGuessCount" min="1" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="submit">確認更新</button>
+                    <button type="button" onclick="closeEditModal()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 確認刪除對話框 -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>確認刪除</h3>
+            <p>確定要刪除這筆排名記錄嗎？</p>
+            <div class="modal-buttons">
+                <button id="confirmDeleteBtn" onclick="confirmDelete()">確認刪除</button>
+                <button onclick="closeDeleteModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/admin.js"></script>
+</body>
+</html>

@@ -71,6 +71,25 @@ input:focus {
     box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
 }
 
+.admin-link {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.admin-link a {
+    color: #666;
+    text-decoration: none;
+    font-size: 14px;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.admin-link a:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
 button {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;

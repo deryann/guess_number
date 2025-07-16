@@ -1,12 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import random
 import sqlite3
 import uuid
 import os
 from datetime import datetime
+from typing import Optional
+import secrets
 
 app = FastAPI()
 
@@ -33,8 +36,26 @@ class GameResult(BaseModel):
     duration: float
     guess_count: int
 
+class AdminLogin(BaseModel):
+    username: str
+    password: str
+
+class RankingUpdate(BaseModel):
+    name: str
+    start_time: str
+    end_time: str
+    duration: float
+    guess_count: int
+
 # Global answer variable kept for backward compatibility but not used in UUID system
 answer = ""
+
+# Simple session management (in-memory storage)
+admin_sessions = {}
+
+# Admin credentials
+ADMIN_USERNAME = "aaa"
+ADMIN_PASSWORD = "bbb"
 
 # Mount static files for frontend
 app.mount("/static", StaticFiles(directory="../frontend"), name="static")
@@ -53,6 +74,20 @@ def get_db_connection():
     conn = sqlite3.connect('ranking.db')
     conn.row_factory = sqlite3.Row
     return conn
+
+def get_admin_session(request: Request):
+    """Check if admin is logged in via session token"""
+    # Try to get token from Authorization header first
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        session_token = auth_header.split(" ")[1]
+    else:
+        # Fall back to cookie
+        session_token = request.cookies.get("admin_session")
+    
+    if not session_token or session_token not in admin_sessions:
+        raise HTTPException(status_code=401, detail="Authentication required")
+    return admin_sessions[session_token]
 
 @app.post("/new_game")
 def new_game(request: NewGameRequest):
@@ -188,3 +223,109 @@ def get_version():
         "minor_version": MINOR_VERSION,
         "version": f"{MAIN_VERSION}.{MINOR_VERSION}"
     }
+
+# Admin endpoints
+@app.get("/admin")
+def admin_page():
+    """Serve admin page"""
+    return FileResponse("../frontend/admin.html")
+
+@app.post("/admin/login")
+def admin_login(login_data: AdminLogin):
+    """Admin login endpoint"""
+    if login_data.username == ADMIN_USERNAME and login_data.password == ADMIN_PASSWORD:
+        session_token = secrets.token_urlsafe(32)
+        admin_sessions[session_token] = {"username": login_data.username}
+        
+        from fastapi import Response
+        response = {"success": True, "session_token": session_token}
+        return response
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@app.post("/admin/logout")
+def admin_logout(request: Request):
+    """Admin logout endpoint"""
+    session_token = request.cookies.get("admin_session")
+    if session_token in admin_sessions:
+        del admin_sessions[session_token]
+    return {"success": True}
+
+@app.get("/admin/rankings")
+def get_all_rankings(request: Request, admin_session = Depends(get_admin_session)):
+    """Get all rankings data for admin"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT id, name, start_time, end_time, duration, guess_count FROM rankings ORDER BY id DESC"
+    )
+    rows = cursor.fetchall()
+    conn.close()
+    return [dict(row) for row in rows]
+
+@app.put("/admin/rankings/{ranking_id}")
+def update_ranking(ranking_id: int, ranking_data: RankingUpdate, request: Request, admin_session = Depends(get_admin_session)):
+    """Update a ranking record"""
+    # 資料驗證
+    if not ranking_data.name or not ranking_data.name.strip():
+        raise HTTPException(status_code=400, detail="Player name cannot be empty")
+    
+    if ranking_data.duration <= 0:
+        raise HTTPException(status_code=400, detail="Duration must be greater than 0")
+    
+    if ranking_data.guess_count <= 0:
+        raise HTTPException(status_code=400, detail="Guess count must be greater than 0")
+    
+    # 驗證時間格式和邏輯
+    try:
+        start_time = datetime.fromisoformat(ranking_data.start_time.replace('Z', '+00:00'))
+        end_time = datetime.fromisoformat(ranking_data.end_time.replace('Z', '+00:00'))
+        
+        if start_time >= end_time:
+            raise HTTPException(status_code=400, detail="End time must be after start time")
+            
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid datetime format")
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Check if ranking exists
+    cursor.execute("SELECT id FROM rankings WHERE id = ?", (ranking_id,))
+    if not cursor.fetchone():
+        conn.close()
+        raise HTTPException(status_code=404, detail="Ranking not found")
+    
+    try:
+        # Update the ranking
+        cursor.execute(
+            "UPDATE rankings SET name = ?, start_time = ?, end_time = ?, duration = ?, guess_count = ? WHERE id = ?",
+            (ranking_data.name.strip(), ranking_data.start_time, ranking_data.end_time, ranking_data.duration, ranking_data.guess_count, ranking_id)
+        )
+        conn.commit()
+        conn.close()
+        
+        return {"success": True, "message": "Ranking updated successfully"}
+        
+    except Exception as e:
+        conn.close()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+
+@app.delete("/admin/rankings/{ranking_id}")
+def delete_ranking(ranking_id: int, request: Request, admin_session = Depends(get_admin_session)):
+    """Delete a ranking record"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Check if ranking exists
+    cursor.execute("SELECT id FROM rankings WHERE id = ?", (ranking_id,))
+    if not cursor.fetchone():
+        conn.close()
+        raise HTTPException(status_code=404, detail="Ranking not found")
+    
+    # Delete the ranking
+    cursor.execute("DELETE FROM rankings WHERE id = ?", (ranking_id,))
+    conn.commit()
+    conn.close()
+    
+    return {"success": True, "message": "Ranking deleted successfully"}
