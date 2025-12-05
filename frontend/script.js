@@ -558,31 +558,55 @@ async function surrenderGame() {
 
 // 為猜測結果著色
 function colorCodeGuesses(answer, history) {
-    // Iterate through all guess rows and color them
-    document.querySelectorAll('.historyTable tbody tr').forEach((row, index) => {
+    // Use history to ensure we color the correct guesses
+    const guessRows = document.querySelectorAll('.historyTable tbody tr');
+    
+    history.forEach((historyItem, index) => {
+        if (index >= guessRows.length) return;
+        
+        const row = guessRows[index];
         const guessCell = row.querySelector('.guess-number');
         if (!guessCell) return;
         
-        const guess = guessCell.textContent.trim();
+        const guess = historyItem.guess;
+        
+        // Track which answer digits have been matched to avoid double-counting
+        const answerUsed = [false, false, false, false];
+        const guessStatus = ['gray', 'gray', 'gray', 'gray']; // default to gray
+        
+        // First pass: Mark exact matches (green)
+        for (let i = 0; i < 4; i++) {
+            if (guess[i] === answer[i]) {
+                guessStatus[i] = 'green';
+                answerUsed[i] = true;
+            }
+        }
+        
+        // Second pass: Mark correct digits in wrong positions (red)
+        for (let i = 0; i < 4; i++) {
+            if (guessStatus[i] === 'gray') { // Only check non-green positions
+                for (let j = 0; j < 4; j++) {
+                    if (!answerUsed[j] && guess[i] === answer[j]) {
+                        guessStatus[i] = 'red';
+                        answerUsed[j] = true;
+                        break;
+                    }
+                }
+            }
+        }
         
         // Create colored version of the guess
         let coloredGuess = '';
         for (let i = 0; i < 4; i++) {
-            const digit = guess[i];
             let color;
-            
-            if (digit === answer[i]) {
-                // Correct position - green
-                color = '#4ade80'; // Green
-            } else if (answer.includes(digit)) {
-                // Correct digit, wrong position - red
-                color = '#f87171'; // Red
+            if (guessStatus[i] === 'green') {
+                color = '#4ade80'; // Green - correct position
+            } else if (guessStatus[i] === 'red') {
+                color = '#f87171'; // Red - correct digit, wrong position
             } else {
-                // Wrong digit - dark gray
-                color = '#6b7280'; // Dark gray
+                color = '#6b7280'; // Dark gray - wrong digit
             }
-            
-            coloredGuess += `<span style="color: ${color}; font-weight: bold;">${digit}</span>`;
+            coloredGuess += `<span style="color: ${color}; font-weight: bold;">${guess[i]}</span>`;
         }
         
         guessCell.innerHTML = coloredGuess;
