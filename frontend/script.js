@@ -672,15 +672,17 @@ function initializeTheme() {
     const savedTheme = localStorage.getItem('guessNumberTheme') || 'original';
     applyTheme(savedTheme);
     
-    // 設定主題按鈕的事件監聽器
+    // 設定主題按鈕的事件監聽器（只在按鈕存在時）
     const themeButtons = document.querySelectorAll('.theme-btn');
-    themeButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const theme = this.getAttribute('data-theme');
-            applyTheme(theme);
-            saveTheme(theme);
+    if (themeButtons.length > 0) {
+        themeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const theme = this.getAttribute('data-theme');
+                applyTheme(theme);
+                saveTheme(theme);
+            });
         });
-    });
+    }
 }
 
 function applyTheme(theme) {

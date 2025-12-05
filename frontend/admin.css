@@ -335,7 +335,7 @@ button:active {
 }
 
 /* ===== 暗黑主題 ===== */
-html.dark-theme {
+body.dark-theme {
     --bg-gradient-start: #1a1a2e;
     --bg-gradient-end: #16213e;
     --primary-color: #7c8edb;
@@ -347,16 +347,16 @@ html.dark-theme {
     --shadow-hover: rgba(0,0,0,0.6);
 }
 
-html.dark-theme #rankingsTable th {
+body.dark-theme #rankingsTable th {
     background: #27272a;
 }
 
-html.dark-theme #rankingsTable tr:hover {
+body.dark-theme #rankingsTable tr:hover {
     background-color: #252b3a;
 }
 
 /* ===== 特殊配色主題 ===== */
-html.special-theme {
+body.special-theme {
     --bg-gradient-start: #D89BB8;
     --bg-gradient-end: #C58AA5;
     --primary-color: #D89BB8;
@@ -368,10 +368,10 @@ html.special-theme {
     --shadow-hover: rgba(216, 155, 184, 0.3);
 }
 
-html.special-theme #rankingsTable th {
+body.special-theme #rankingsTable th {
     background: #E8F5E3;
 }
 
-html.special-theme #rankingsTable tr:hover {
+body.special-theme #rankingsTable tr:hover {
     background-color: #B4D4E8;
 }
