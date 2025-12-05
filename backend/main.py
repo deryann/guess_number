@@ -10,6 +10,7 @@ import os
 from datetime import datetime
 from typing import Optional
 import secrets
+from database_setup import setup_database
 
 app = FastAPI()
 
@@ -74,6 +75,14 @@ def get_db_connection():
     conn = sqlite3.connect('ranking.db')
     conn.row_factory = sqlite3.Row
     return conn
+
+@app.on_event("startup")
+def startup_event():
+    """Run database initialization on startup"""
+    print("=" * 50)
+    print("Starting FastAPI application...")
+    print("=" * 50)
+    setup_database()
 
 def get_admin_session(request: Request):
     """Check if admin is logged in via session token"""
