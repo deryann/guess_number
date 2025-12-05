@@ -5,11 +5,25 @@
     box-sizing: border-box;
 }
 
+/* CSS Variables for Theme Support */
+:root {
+    --bg-gradient-start: #667eea;
+    --bg-gradient-end: #764ba2;
+    --primary-color: #667eea;
+    --container-bg: white;
+    --text-primary: #333;
+    --text-secondary: #555;
+    --border-color: #ddd;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --shadow-hover: rgba(0, 0, 0, 0.2);
+}
+
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     min-height: 100vh;
-    color: #333;
+    color: var(--text-primary);
+    transition: background 0.3s ease;
 }
 
 /* 登入頁面樣式 */
@@ -22,19 +36,21 @@ body {
 }
 
 .login-card {
-    background: white;
+    background: var(--container-bg);
     padding: 40px;
     border-radius: 15px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 35px var(--shadow);
     width: 100%;
     max-width: 400px;
     text-align: center;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .login-card h1 {
     margin-bottom: 30px;
-    color: #667eea;
+    color: var(--primary-color);
     font-size: 2em;
+    transition: color 0.3s ease;
 }
 
 .form-group {
@@ -46,25 +62,28 @@ body {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
-    color: #555;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
 }
 
 .form-group input {
     width: 100%;
     padding: 12px;
-    border: 2px solid #ddd;
+    border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, background 0.3s, color 0.3s;
+    background: var(--container-bg);
+    color: var(--text-primary);
 }
 
 .form-group input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--primary-color);
 }
 
 button {
-    background: linear-gradient(45deg, #667eea, #764ba2);
+    background: linear-gradient(45deg, var(--bg-gradient-start), var(--bg-gradient-end));
     color: white;
     border: none;
     padding: 12px 24px;
@@ -76,7 +95,7 @@ button {
 
 button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 5px 15px var(--shadow-hover);
 }
 
 button:active {
@@ -88,9 +107,10 @@ button:active {
 }
 
 .back-link a {
-    color: #667eea;
+    color: var(--primary-color);
     text-decoration: none;
     font-size: 14px;
+    transition: color 0.3s ease;
 }
 
 .back-link a:hover {
@@ -108,16 +128,18 @@ button:active {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: white;
+    background: var(--container-bg);
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px var(--shadow);
     margin-bottom: 20px;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .admin-header h1 {
-    color: #667eea;
+    color: var(--primary-color);
     font-size: 2em;
+    transition: color 0.3s ease;
 }
 
 .admin-controls {
@@ -131,15 +153,17 @@ button:active {
 }
 
 .admin-content {
-    background: white;
+    background: var(--container-bg);
     padding: 20px;
     border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px var(--shadow);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .rankings-section h2 {
     margin-bottom: 20px;
-    color: #555;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
 }
 
 /* 表格樣式 */
@@ -153,17 +177,20 @@ button:active {
 #rankingsTable td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border-color);
+    transition: border-color 0.3s ease;
 }
 
 #rankingsTable th {
     background: #f8f9fa;
     font-weight: bold;
-    color: #555;
+    color: var(--text-secondary);
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 #rankingsTable tr:hover {
     background-color: #f5f5f5;
+    transition: background-color 0.3s ease;
 }
 
 /* 操作按鈕 */
@@ -197,18 +224,20 @@ button:active {
 }
 
 .modal-content {
-    background-color: white;
+    background-color: var(--container-bg);
     margin: 15% auto;
     padding: 30px;
     border-radius: 15px;
     width: 90%;
     max-width: 500px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 15px 35px var(--shadow-hover);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .modal-content h3 {
     margin-bottom: 20px;
-    color: #667eea;
+    color: var(--primary-color);
+    transition: color 0.3s ease;
 }
 
 .modal-buttons {
@@ -295,7 +324,7 @@ button:active {
     width: 20px;
     height: 20px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #667eea;
+    border-top: 3px solid var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -303,4 +332,46 @@ button:active {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* ===== 暗黑主題 ===== */
+body.dark-theme {
+    --bg-gradient-start: #1a1a2e;
+    --bg-gradient-end: #16213e;
+    --primary-color: #7c8edb;
+    --container-bg: #0f1419;
+    --text-primary: #e4e4e7;
+    --text-secondary: #a1a1aa;
+    --border-color: #3f3f46;
+    --shadow: rgba(0,0,0,0.4);
+    --shadow-hover: rgba(0,0,0,0.6);
+}
+
+body.dark-theme #rankingsTable th {
+    background: #27272a;
+}
+
+body.dark-theme #rankingsTable tr:hover {
+    background-color: #252b3a;
+}
+
+/* ===== 特殊配色主題 ===== */
+body.special-theme {
+    --bg-gradient-start: #D89BB8;
+    --bg-gradient-end: #C58AA5;
+    --primary-color: #D89BB8;
+    --container-bg: #F3E5E3;
+    --text-primary: #4a4a4a;
+    --text-secondary: #6b6b6b;
+    --border-color: #D89BB8;
+    --shadow: rgba(216, 155, 184, 0.2);
+    --shadow-hover: rgba(216, 155, 184, 0.3);
+}
+
+body.special-theme #rankingsTable th {
+    background: #E8F5E3;
+}
+
+body.special-theme #rankingsTable tr:hover {
+    background-color: #B4D4E8;
 }

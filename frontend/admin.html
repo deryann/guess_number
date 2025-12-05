@@ -7,6 +7,17 @@
     <link rel="stylesheet" href="/static/admin.css">
 </head>
 <body>
+    <script>
+        // Load theme from localStorage immediately when body is available
+        (function() {
+            const savedTheme = localStorage.getItem('guessNumberTheme') || 'original';
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else if (savedTheme === 'special') {
+                document.body.classList.add('special-theme');
+            }
+        })();
+    </script>
     <!-- 登入頁面 -->
     <div id="login-container">
         <div class="login-card">

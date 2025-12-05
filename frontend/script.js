@@ -79,6 +79,7 @@ const ROWS_PER_TABLE = 5;   // 每個表格最多顯示的行數
 document.addEventListener('DOMContentLoaded', function() {
     loadVersionInfo();
     loadHomepageRanking();
+    initializeTheme();
 });
 
 async function loadVersionInfo() {
@@ -663,5 +664,52 @@ function closeVictoryAnimation() {
 
 function closeVictoryAndNewGame() {
     closeOverlayWithAnimation(() => newGame());
+}
+
+// ===== 主題切換功能 =====
+function initializeTheme() {
+    // 從 localStorage 載入已儲存的主題
+    const savedTheme = localStorage.getItem('guessNumberTheme') || 'original';
+    applyTheme(savedTheme);
+    
+    // 設定主題按鈕的事件監聽器（只在按鈕存在時）
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    if (themeButtons.length > 0) {
+        themeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const theme = this.getAttribute('data-theme');
+                applyTheme(theme);
+                saveTheme(theme);
+            });
+        });
+    }
+}
+
+function applyTheme(theme) {
+    const body = document.body;
+    
+    // 移除所有主題類別
+    body.classList.remove('dark-theme', 'special-theme');
+    
+    // 套用選擇的主題
+    if (theme === 'dark') {
+        body.classList.add('dark-theme');
+    } else if (theme === 'special') {
+        body.classList.add('special-theme');
+    }
+    
+    // 更新按鈕的 active 狀態
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    themeButtons.forEach(button => {
+        if (button.getAttribute('data-theme') === theme) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
+}
+
+function saveTheme(theme) {
+    localStorage.setItem('guessNumberTheme', theme);
 }
 
