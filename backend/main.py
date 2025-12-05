@@ -230,7 +230,7 @@ def get_hint(hint_request: HintRequest):
             "message": "請先進行至少一次猜測，系統才能提供提示！",
             "confirmed_digits": [],
             "eliminated_digits": [],
-            "position_hints": []
+            "unguessed_digits": sorted(list(all_digits))
         }
     
     # Analyze the guesses to provide hints
@@ -238,7 +238,6 @@ def get_hint(hint_request: HintRequest):
     guessed_digits = set()
     confirmed_in_answer = set()  # Digits that are definitely in the answer
     eliminated_digits = set()     # Digits that are definitely not in the answer
-    position_info = {}            # Information about positions
     
     for guess_row in history:
         guess = guess_row[0]

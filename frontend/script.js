@@ -182,56 +182,75 @@ async function getHint() {
 // Display hint information
 function displayHint(hintData) {
     const hintSection = document.getElementById('hint-section');
+    hintSection.innerHTML = ''; // Clear previous content
     
-    let hintHtml = '<div class="hint-container">';
-    hintHtml += '<h3>💡 遊戲提示</h3>';
+    // Create hint container
+    const hintContainer = document.createElement('div');
+    hintContainer.className = 'hint-container';
+    
+    // Add title
+    const title = document.createElement('h3');
+    title.textContent = '💡 遊戲提示';
+    hintContainer.appendChild(title);
     
     // Display the main message
     if (hintData.message) {
+        const messagesDiv = document.createElement('div');
+        messagesDiv.className = 'hint-messages';
         const messages = hintData.message.split('\n');
-        hintHtml += '<div class="hint-messages">';
         messages.forEach(msg => {
-            hintHtml += `<p>${msg}</p>`;
+            const p = document.createElement('p');
+            p.textContent = msg;
+            messagesDiv.appendChild(p);
         });
-        hintHtml += '</div>';
+        hintContainer.appendChild(messagesDiv);
+    }
+    
+    // Helper function to create digit category
+    function createDigitCategory(title, digits, categoryClass, digitClass) {
+        const categoryDiv = document.createElement('div');
+        categoryDiv.className = `hint-category ${categoryClass}`;
+        
+        const strong = document.createElement('strong');
+        strong.textContent = title;
+        categoryDiv.appendChild(strong);
+        
+        const digitList = document.createElement('div');
+        digitList.className = 'digit-list';
+        
+        digits.forEach(digit => {
+            const span = document.createElement('span');
+            span.className = `digit ${digitClass}`;
+            span.textContent = digit;
+            digitList.appendChild(span);
+        });
+        
+        categoryDiv.appendChild(digitList);
+        return categoryDiv;
     }
     
     // Display confirmed digits
     if (hintData.confirmed_digits && hintData.confirmed_digits.length > 0) {
-        hintHtml += '<div class="hint-category confirmed">';
-        hintHtml += '<strong>✓ 確定在答案中：</strong>';
-        hintHtml += '<div class="digit-list">';
-        hintData.confirmed_digits.forEach(digit => {
-            hintHtml += `<span class="digit confirmed-digit">${digit}</span>`;
-        });
-        hintHtml += '</div></div>';
+        hintContainer.appendChild(
+            createDigitCategory('✓ 確定在答案中：', hintData.confirmed_digits, 'confirmed', 'confirmed-digit')
+        );
     }
     
     // Display eliminated digits
     if (hintData.eliminated_digits && hintData.eliminated_digits.length > 0) {
-        hintHtml += '<div class="hint-category eliminated">';
-        hintHtml += '<strong>✗ 確定不在答案中：</strong>';
-        hintHtml += '<div class="digit-list">';
-        hintData.eliminated_digits.forEach(digit => {
-            hintHtml += `<span class="digit eliminated-digit">${digit}</span>`;
-        });
-        hintHtml += '</div></div>';
+        hintContainer.appendChild(
+            createDigitCategory('✗ 確定不在答案中：', hintData.eliminated_digits, 'eliminated', 'eliminated-digit')
+        );
     }
     
     // Display unguessed digits
     if (hintData.unguessed_digits && hintData.unguessed_digits.length > 0) {
-        hintHtml += '<div class="hint-category unguessed">';
-        hintHtml += '<strong>💡 尚未嘗試：</strong>';
-        hintHtml += '<div class="digit-list">';
-        hintData.unguessed_digits.forEach(digit => {
-            hintHtml += `<span class="digit unguessed-digit">${digit}</span>`;
-        });
-        hintHtml += '</div></div>';
+        hintContainer.appendChild(
+            createDigitCategory('💡 尚未嘗試：', hintData.unguessed_digits, 'unguessed', 'unguessed-digit')
+        );
     }
     
-    hintHtml += '</div>';
-    
-    hintSection.innerHTML = hintHtml;
+    hintSection.appendChild(hintContainer);
     hintSection.style.display = 'block';
     
     // Scroll to hint section
