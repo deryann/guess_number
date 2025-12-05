@@ -410,14 +410,9 @@ function createFireworks() {
         const tx = Math.cos(angle) * velocity;
         const ty = Math.sin(angle) * velocity;
         
-        particle.style.animation = `fireworkExplode 1s ease-out forwards`;
         particle.style.setProperty('--tx', tx + 'px');
         particle.style.setProperty('--ty', ty + 'px');
-        
-        // Apply transform
-        setTimeout(() => {
-            particle.style.transform = `translate(${tx}px, ${ty}px)`;
-        }, 10);
+        particle.style.animation = `fireworkExplode 1s ease-out forwards`;
         
         document.body.appendChild(particle);
         

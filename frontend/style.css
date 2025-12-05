@@ -596,6 +596,7 @@ button:disabled {
         opacity: 1;
     }
     100% {
+        transform: translate(var(--tx), var(--ty));
         opacity: 0;
     }
 }
