@@ -78,6 +78,7 @@ const ROWS_PER_TABLE = 5;   // 每個表格最多顯示的行數
 // Load version information when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadVersionInfo();
+    loadHomepageRanking();
 });
 
 async function loadVersionInfo() {
@@ -94,6 +95,84 @@ async function loadVersionInfo() {
     } catch (error) {
         console.error('Error loading version info:', error);
         document.getElementById('version-display').textContent = 'dev.dev';
+    }
+}
+
+// Generate ranking table HTML safely to prevent XSS
+function createRankingTable(rankingData, includeIdColumn = false) {
+    const table = document.createElement('table');
+    
+    // Create header
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    const headers = ['排名', '姓名', '猜測次數', '花費時間 (秒)'];
+    headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    // Create body
+    const tbody = document.createElement('tbody');
+    rankingData.forEach((row, index) => {
+        const tr = document.createElement('tr');
+        if (includeIdColumn && row.id) {
+            tr.id = `rank-${row.id}`;
+        }
+        
+        // Rank
+        const tdRank = document.createElement('td');
+        tdRank.textContent = index + 1;
+        tr.appendChild(tdRank);
+        
+        // Name (safely escaped)
+        const tdName = document.createElement('td');
+        tdName.textContent = row.name;
+        tr.appendChild(tdName);
+        
+        // Guess count
+        const tdGuessCount = document.createElement('td');
+        tdGuessCount.textContent = row.guess_count;
+        tr.appendChild(tdGuessCount);
+        
+        // Duration
+        const tdDuration = document.createElement('td');
+        tdDuration.textContent = row.duration;
+        tr.appendChild(tdDuration);
+        
+        tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    
+    return table;
+}
+
+async function loadHomepageRanking() {
+    const rankingList = document.getElementById('homepage-ranking-list');
+    
+    try {
+        const response = await fetch(`${API_URL}/ranking`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch ranking');
+        }
+        
+        const rankingData = await response.json();
+        
+        if (rankingData.length === 0) {
+            rankingList.innerHTML = '<div class="ranking-loading">尚無排行資料</div>';
+            return;
+        }
+        
+        // Clear existing content and append the table
+        rankingList.innerHTML = '';
+        const table = createRankingTable(rankingData, false);
+        rankingList.appendChild(table);
+        
+    } catch (error) {
+        console.error('Failed to load homepage ranking:', error);
+        rankingList.innerHTML = '<div class="ranking-error">⚠️ 無法載入排行榜資料</div>';
     }
 }
 
@@ -247,13 +326,22 @@ async function showRanking(highlightId) {
         const rankingData = await response.json();
         const rankingList = document.getElementById('ranking-list');
         
-        let tableHtml = '<table><tr><th>排名</th><th>姓名</th><th>猜測次數</th><th>花費時間 (秒)</th></tr>';
-        rankingData.forEach((row, index) => {
-            const isCurrent = row.id === highlightId;
-            tableHtml += `<tr id="rank-${row.id}" class="${isCurrent ? 'current-player' : ''}"><td>${index + 1}</td><td>${row.name}</td><td>${row.guess_count}</td><td>${row.duration}</td></tr>`;
-        });
-        tableHtml += '</table>';
-        rankingList.innerHTML = tableHtml;
+        // Clear existing content
+        rankingList.innerHTML = '';
+        
+        // Create and append table
+        const table = createRankingTable(rankingData, true);
+        rankingList.appendChild(table);
+        
+        // Apply highlighting if needed
+        if (highlightId) {
+            const rows = table.querySelectorAll('tbody tr');
+            rankingData.forEach((row, index) => {
+                if (row.id === highlightId) {
+                    rows[index].classList.add('current-player');
+                }
+            });
+        }
 
         toggleRankingModal(true);
 

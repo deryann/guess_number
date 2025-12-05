@@ -854,3 +854,131 @@ button:disabled {
         flex-direction: column;
     }
 }
+
+/* ===== Homepage Ranking Styles ===== */
+.homepage-ranking {
+    margin-top: 30px;
+    padding-top: 25px;
+    border-top: 2px solid #e2e8f0;
+    text-align: center;
+}
+
+.homepage-ranking h3 {
+    color: #5a67d8;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+#homepage-ranking-list {
+    max-height: 400px;
+    overflow-y: auto;
+    margin: 0 auto;
+}
+
+.ranking-loading {
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
+.ranking-error {
+    color: #e53e3e;
+    padding: 20px;
+    background: #fed7d7;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+#homepage-ranking-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: white;
+}
+
+#homepage-ranking-list th,
+#homepage-ranking-list td {
+    border: 1px solid #e2e8f0;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+#homepage-ranking-list th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+#homepage-ranking-list tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+#homepage-ranking-list tbody tr:hover {
+    background-color: #e3f2fd;
+    transition: background-color 0.2s ease;
+}
+
+#homepage-ranking-list tbody tr td:first-child {
+    font-weight: bold;
+    color: #5a67d8;
+}
+
+/* Medal icons for top 3 */
+#homepage-ranking-list tbody tr:nth-child(1) td:first-child::before {
+    content: '🥇 ';
+}
+
+#homepage-ranking-list tbody tr:nth-child(2) td:first-child::before {
+    content: '🥈 ';
+}
+
+#homepage-ranking-list tbody tr:nth-child(3) td:first-child::before {
+    content: '🥉 ';
+}
+
+/* Scrollbar styling for ranking list */
+#homepage-ranking-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#homepage-ranking-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#homepage-ranking-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+#homepage-ranking-list::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* Responsive design for homepage ranking */
+@media (max-width: 768px) {
+    #homepage-ranking-list {
+        max-height: 300px;
+    }
+    
+    #homepage-ranking-list th,
+    #homepage-ranking-list td {
+        padding: 10px 6px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 480px) {
+    .homepage-ranking h3 {
+        font-size: 1.3em;
+    }
+    
+    #homepage-ranking-list th,
+    #homepage-ranking-list td {
+        padding: 8px 4px;
+        font-size: 0.85em;
+    }
+}
