@@ -185,6 +185,17 @@ button:disabled {
     box-shadow: none;
 }
 
+/* Surrender button styling */
+#surrenderButton {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    font-size: 1.1em;
+}
+
+#surrenderButton:hover {
+    background: linear-gradient(135deg, #ff5252 0%, #e63946 100%);
+    box-shadow: 0 10px 20px rgba(255, 107, 107, 0.4);
+}
+
 .history {
     display: flex;
     flex-wrap: wrap;
