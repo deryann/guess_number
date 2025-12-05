@@ -298,6 +298,7 @@ async function makeGuess() {
         if (result.game_completed) {
             gameOver = true;
             clearInterval(timerInterval);
+            updatePauseButton(); // 遊戲結束時禁用暫停按鈕
             lastGameResultId = result.ranking_id;
             showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${result.guess_count} 次，花了 ${Math.round(result.duration)} 秒。`, 'success');
             showVictoryAnimation(result.guess_count, Math.round(result.duration));
