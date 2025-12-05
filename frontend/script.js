@@ -78,6 +78,7 @@ const ROWS_PER_TABLE = 5;   // 每個表格最多顯示的行數
 // Load version information when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadVersionInfo();
+    loadHomepageRanking();
 });
 
 async function loadVersionInfo() {
@@ -94,6 +95,37 @@ async function loadVersionInfo() {
     } catch (error) {
         console.error('Error loading version info:', error);
         document.getElementById('version-display').textContent = 'dev.dev';
+    }
+}
+
+async function loadHomepageRanking() {
+    const rankingList = document.getElementById('homepage-ranking-list');
+    
+    try {
+        const response = await fetch(`${API_URL}/ranking`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch ranking');
+        }
+        
+        const rankingData = await response.json();
+        
+        if (rankingData.length === 0) {
+            rankingList.innerHTML = '<div class="ranking-loading">尚無排行資料</div>';
+            return;
+        }
+        
+        let tableHtml = '<table><thead><tr><th>排名</th><th>姓名</th><th>猜測次數</th><th>時間(秒)</th></tr></thead><tbody>';
+        
+        rankingData.forEach((row, index) => {
+            tableHtml += `<tr><td>${index + 1}</td><td>${row.name}</td><td>${row.guess_count}</td><td>${row.duration}</td></tr>`;
+        });
+        
+        tableHtml += '</tbody></table>';
+        rankingList.innerHTML = tableHtml;
+        
+    } catch (error) {
+        console.error('Failed to load homepage ranking:', error);
+        rankingList.innerHTML = '<div class="ranking-error">⚠️ 無法載入排行榜資料</div>';
     }
 }
 
