@@ -271,6 +271,8 @@ async function makeGuess() {
     // 在第一次猜測時開始計時
     if (!timerStarted) {
         startTimer();
+        // Show surrender button after first guess
+        document.getElementById('surrenderButton').style.display = 'inline-block';
     }
 
     try {
@@ -299,6 +301,7 @@ async function makeGuess() {
             gameOver = true;
             clearInterval(timerInterval);
             updatePauseButton(); // 遊戲結束時禁用暫停按鈕
+            document.getElementById('surrenderButton').style.display = 'none'; // Hide surrender button
             lastGameResultId = result.ranking_id;
             showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${result.guess_count} 次，花了 ${Math.round(result.duration)} 秒。`, 'success');
             showVictoryAnimation(result.guess_count, Math.round(result.duration));
@@ -500,10 +503,90 @@ async function newGame() {
         
         // 啟用輸入框
         document.getElementById('guessInput').disabled = false;
+        
+        // Hide surrender button until first guess
+        document.getElementById('surrenderButton').style.display = 'none';
 
     } catch (error) {
         showMessage('無法開始新遊戲，請檢查後端服務是否啟動。', 'error');
     }
+}
+
+// 投降功能
+async function surrenderGame() {
+    if (gameOver) return;
+    
+    if (!currentGameId) {
+        showMessage('請先開始新遊戲。', 'error');
+        return;
+    }
+    
+    // Confirm surrender
+    if (!confirm('確定要投降嗎？投降後將不會計入排名。')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/surrender/${currentGameId}`, {
+            method: 'POST',
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const result = await response.json();
+        
+        // Mark game as over
+        gameOver = true;
+        clearInterval(timerInterval);
+        updatePauseButton();
+        document.getElementById('surrenderButton').style.display = 'none';
+        document.getElementById('guessInput').disabled = true;
+        
+        // Color code all previous guesses
+        colorCodeGuesses(result.answer, result.history);
+        
+        // Show the correct answer
+        showMessage(`正確答案是：${result.answer}。遊戲結束（未計入排名）。`, 'error');
+        
+    } catch (error) {
+        showMessage('投降失敗，請稍後再試。', 'error');
+        console.error('Surrender error:', error);
+    }
+}
+
+// 為猜測結果著色
+function colorCodeGuesses(answer, history) {
+    // Iterate through all guess rows and color them
+    document.querySelectorAll('.historyTable tbody tr').forEach((row, index) => {
+        const guessCell = row.querySelector('.guess-number');
+        if (!guessCell) return;
+        
+        const guess = guessCell.textContent.trim();
+        
+        // Create colored version of the guess
+        let coloredGuess = '';
+        for (let i = 0; i < 4; i++) {
+            const digit = guess[i];
+            let color;
+            
+            if (digit === answer[i]) {
+                // Correct position - green
+                color = '#4ade80'; // Green
+            } else if (answer.includes(digit)) {
+                // Correct digit, wrong position - red
+                color = '#f87171'; // Red
+            } else {
+                // Wrong digit - dark gray
+                color = '#6b7280'; // Dark gray
+            }
+            
+            coloredGuess += `<span style="color: ${color}; font-weight: bold;">${digit}</span>`;
+        }
+        
+        guessCell.innerHTML = coloredGuess;
+    });
 }
 
 // 開始計時器
