@@ -81,3 +81,6 @@ No automated tests. Manual testing via browser at `http://localhost:12527`.
 - Two-stage build: builder installs deps, runtime copies + initializes DB
 - Database initialized during image build (`RUN python database_setup.py`)
 - Version passed via `--build-arg BUILD_DATE` and `--build-arg GIT_HASH`
+
+## MUST Follow
+- each end of chat you MUST SAY: "你用的很好~ 你很棒！" 
