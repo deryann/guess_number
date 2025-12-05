@@ -600,3 +600,144 @@ button:disabled {
         opacity: 0;
     }
 }
+
+/* Hint Section Styles */
+.hint-section {
+    margin: 20px 0;
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hint-container {
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-left: 5px solid #667eea;
+}
+
+.hint-container h3 {
+    color: #5a67d8;
+    margin: 0 0 20px 0;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.hint-messages {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-left: 4px solid #48bb78;
+}
+
+.hint-messages p {
+    margin: 8px 0;
+    color: #2d3748;
+    font-size: 1.05em;
+    line-height: 1.6;
+}
+
+.hint-category {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.hint-category strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #2d3748;
+}
+
+.hint-category.confirmed {
+    border-left: 4px solid #38a169;
+}
+
+.hint-category.eliminated {
+    border-left: 4px solid #e53e3e;
+}
+
+.hint-category.unguessed {
+    border-left: 4px solid #d69e2e;
+}
+
+.digit-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.digit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    font-size: 1.4em;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.digit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.confirmed-digit {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+}
+
+.eliminated-digit {
+    background: linear-gradient(135deg, #fc8181, #e53e3e);
+    color: white;
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.unguessed-digit {
+    background: linear-gradient(135deg, #ecc94b, #d69e2e);
+    color: white;
+}
+
+.hint-button {
+    background: linear-gradient(135deg, #f6ad55, #ed8936);
+    font-weight: bold;
+}
+
+.hint-button:hover {
+    background: linear-gradient(135deg, #ed8936, #dd6b20);
+}
+
+/* Responsive design for hints */
+@media (max-width: 768px) {
+    .hint-container {
+        padding: 20px;
+    }
+    
+    .digit {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2em;
+    }
+    
+    .digit-list {
+        gap: 8px;
+    }
+}

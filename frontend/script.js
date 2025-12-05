@@ -147,6 +147,97 @@ async function makeGuess() {
     document.getElementById('guessInput').value = '';
 }
 
+// Get hint from the backend
+async function getHint() {
+    if (!currentGameId) {
+        showMessage('請先開始新遊戲。', 'error');
+        return;
+    }
+
+    if (gameOver) {
+        showMessage('遊戲已結束，無需提示。', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/get_hint`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ game_id: currentGameId }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const hintData = await response.json();
+        displayHint(hintData);
+    } catch (error) {
+        showMessage('無法獲取提示，請稍後再試。', 'error');
+    }
+}
+
+// Display hint information
+function displayHint(hintData) {
+    const hintSection = document.getElementById('hint-section');
+    
+    let hintHtml = '<div class="hint-container">';
+    hintHtml += '<h3>💡 遊戲提示</h3>';
+    
+    // Display the main message
+    if (hintData.message) {
+        const messages = hintData.message.split('\n');
+        hintHtml += '<div class="hint-messages">';
+        messages.forEach(msg => {
+            hintHtml += `<p>${msg}</p>`;
+        });
+        hintHtml += '</div>';
+    }
+    
+    // Display confirmed digits
+    if (hintData.confirmed_digits && hintData.confirmed_digits.length > 0) {
+        hintHtml += '<div class="hint-category confirmed">';
+        hintHtml += '<strong>✓ 確定在答案中：</strong>';
+        hintHtml += '<div class="digit-list">';
+        hintData.confirmed_digits.forEach(digit => {
+            hintHtml += `<span class="digit confirmed-digit">${digit}</span>`;
+        });
+        hintHtml += '</div></div>';
+    }
+    
+    // Display eliminated digits
+    if (hintData.eliminated_digits && hintData.eliminated_digits.length > 0) {
+        hintHtml += '<div class="hint-category eliminated">';
+        hintHtml += '<strong>✗ 確定不在答案中：</strong>';
+        hintHtml += '<div class="digit-list">';
+        hintData.eliminated_digits.forEach(digit => {
+            hintHtml += `<span class="digit eliminated-digit">${digit}</span>`;
+        });
+        hintHtml += '</div></div>';
+    }
+    
+    // Display unguessed digits
+    if (hintData.unguessed_digits && hintData.unguessed_digits.length > 0) {
+        hintHtml += '<div class="hint-category unguessed">';
+        hintHtml += '<strong>💡 尚未嘗試：</strong>';
+        hintHtml += '<div class="digit-list">';
+        hintData.unguessed_digits.forEach(digit => {
+            hintHtml += `<span class="digit unguessed-digit">${digit}</span>`;
+        });
+        hintHtml += '</div></div>';
+    }
+    
+    hintHtml += '</div>';
+    
+    hintSection.innerHTML = hintHtml;
+    hintSection.style.display = 'block';
+    
+    // Scroll to hint section
+    hintSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
 // Note: This function is kept for backward compatibility but is no longer used
 // The backend now automatically handles score saving when the game is completed
 async function saveScore(name, startTime, endTime, duration, guessCount) {
@@ -311,6 +402,8 @@ async function newGame() {
         document.getElementById('guessCount').textContent = '0';
         document.getElementById('guessInput').value = '';
         document.getElementById('message').innerHTML = '';
+        document.getElementById('hint-section').style.display = 'none';
+        document.getElementById('hint-section').innerHTML = '';
         clearAllHistoryTables(); // 清除所有歷史表格
         
         clearInterval(timerInterval);

@@ -47,6 +47,9 @@ class RankingUpdate(BaseModel):
     duration: float
     guess_count: int
 
+class HintRequest(BaseModel):
+    game_id: str
+
 # Global answer variable kept for backward compatibility but not used in UUID system
 answer = ""
 
@@ -190,6 +193,111 @@ def make_guess(guess: Guess):
     conn.close()
     
     return response_data
+
+@app.post("/get_hint")
+def get_hint(hint_request: HintRequest):
+    """
+    Analyze previous guesses and provide hints to the player.
+    Returns information about confirmed digits, eliminated digits, and position suggestions.
+    """
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get game session
+    cursor.execute("SELECT answer, is_completed FROM games WHERE game_id = ?", (hint_request.game_id,))
+    game_row = cursor.fetchone()
+    
+    if not game_row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Game not found.")
+    
+    if game_row[1]:  # is_completed
+        conn.close()
+        raise HTTPException(status_code=400, detail="Game already completed.")
+    
+    answer = game_row[0]
+    
+    # Get all previous guesses
+    cursor.execute(
+        "SELECT guess_number, result_a, result_b FROM game_history WHERE game_id = ? ORDER BY guess_time ASC",
+        (hint_request.game_id,)
+    )
+    history = cursor.fetchall()
+    conn.close()
+    
+    if not history:
+        return {
+            "message": "請先進行至少一次猜測，系統才能提供提示！",
+            "confirmed_digits": [],
+            "eliminated_digits": [],
+            "position_hints": []
+        }
+    
+    # Analyze the guesses to provide hints
+    all_digits = set('0123456789')
+    guessed_digits = set()
+    confirmed_in_answer = set()  # Digits that are definitely in the answer
+    eliminated_digits = set()     # Digits that are definitely not in the answer
+    position_info = {}            # Information about positions
+    
+    for guess_row in history:
+        guess = guess_row[0]
+        a_count = guess_row[1]
+        b_count = guess_row[2]
+        total_correct = a_count + b_count
+        
+        guessed_digits.update(guess)
+        
+        # If total_correct is 0, all digits in this guess are not in the answer
+        if total_correct == 0:
+            eliminated_digits.update(guess)
+        # If total_correct equals the number of unique digits, they're all in the answer
+        elif total_correct == 4:
+            confirmed_in_answer.update(guess)
+        elif total_correct > 0:
+            # At least some of these digits are in the answer
+            # We can't be certain which ones without more analysis
+            pass
+    
+    # Digits that haven't been guessed yet
+    unguessed_digits = all_digits - guessed_digits
+    
+    # Digits that we're certain are NOT in the answer
+    definitely_not = eliminated_digits
+    
+    # Build the hint response
+    hint_data = {
+        "confirmed_digits": sorted(list(confirmed_in_answer)),
+        "eliminated_digits": sorted(list(definitely_not)),
+        "unguessed_digits": sorted(list(unguessed_digits)),
+        "message": ""
+    }
+    
+    # Generate a helpful message based on analysis
+    messages = []
+    
+    if confirmed_in_answer:
+        messages.append(f"✓ 確定在答案中的數字: {', '.join(sorted(list(confirmed_in_answer)))}")
+    
+    if definitely_not:
+        messages.append(f"✗ 確定不在答案中的數字: {', '.join(sorted(list(definitely_not)))}")
+    
+    if unguessed_digits:
+        messages.append(f"💡 尚未嘗試的數字: {', '.join(sorted(list(unguessed_digits)))}")
+    
+    # Provide strategic advice
+    if len(confirmed_in_answer) == 4:
+        messages.append("⭐ 你已經找到所有4個數字了！現在只需要找出正確的位置！")
+    elif len(confirmed_in_answer) > 0:
+        remaining = 4 - len(confirmed_in_answer)
+        messages.append(f"📍 還需要找到 {remaining} 個數字")
+    
+    if unguessed_digits and len(confirmed_in_answer) < 4:
+        messages.append("💡 提示：嘗試使用尚未猜過的數字可能會有新發現！")
+    
+    hint_data["message"] = "\n".join(messages) if messages else "繼續加油！仔細分析之前的猜測結果。"
+    
+    return hint_data
 
 @app.post("/add_score")
 def add_score(result: GameResult):
