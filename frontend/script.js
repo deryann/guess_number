@@ -82,7 +82,6 @@ let lastPauseTime = 0;  // 最後一次暫停的時間點
 // Load version information when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadVersionInfo();
-    loadHomepageRanking();
     initializeTheme();
 });
 
@@ -106,7 +105,7 @@ async function loadVersionInfo() {
 // Generate ranking table HTML safely to prevent XSS
 function createRankingTable(rankingData, includeIdColumn = false) {
     const table = document.createElement('table');
-    
+
     // Create header
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
@@ -118,7 +117,7 @@ function createRankingTable(rankingData, includeIdColumn = false) {
     });
     thead.appendChild(headerRow);
     table.appendChild(thead);
-    
+
     // Create body
     const tbody = document.createElement('tbody');
     rankingData.forEach((row, index) => {
@@ -126,59 +125,32 @@ function createRankingTable(rankingData, includeIdColumn = false) {
         if (includeIdColumn && row.id) {
             tr.id = `rank-${row.id}`;
         }
-        
+
         // Rank
         const tdRank = document.createElement('td');
         tdRank.textContent = index + 1;
         tr.appendChild(tdRank);
-        
+
         // Name (safely escaped)
         const tdName = document.createElement('td');
         tdName.textContent = row.name;
         tr.appendChild(tdName);
-        
+
         // Guess count
         const tdGuessCount = document.createElement('td');
         tdGuessCount.textContent = row.guess_count;
         tr.appendChild(tdGuessCount);
-        
+
         // Duration
         const tdDuration = document.createElement('td');
         tdDuration.textContent = row.duration;
         tr.appendChild(tdDuration);
-        
+
         tbody.appendChild(tr);
     });
     table.appendChild(tbody);
-    
-    return table;
-}
 
-async function loadHomepageRanking() {
-    const rankingList = document.getElementById('homepage-ranking-list');
-    
-    try {
-        const response = await fetch(`${API_URL}/ranking`);
-        if (!response.ok) {
-            throw new Error('Failed to fetch ranking');
-        }
-        
-        const rankingData = await response.json();
-        
-        if (rankingData.length === 0) {
-            rankingList.innerHTML = '<div class="ranking-loading">尚無排行資料</div>';
-            return;
-        }
-        
-        // Clear existing content and append the table
-        rankingList.innerHTML = '';
-        const table = createRankingTable(rankingData, false);
-        rankingList.appendChild(table);
-        
-    } catch (error) {
-        console.error('Failed to load homepage ranking:', error);
-        rankingList.innerHTML = '<div class="ranking-error">⚠️ 無法載入排行榜資料</div>';
-    }
+    return table;
 }
 
 function startGame() {
