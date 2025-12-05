@@ -74,6 +74,10 @@ let lastGameResultId = null;
 let currentGameId = null;  // Store the current game UUID
 let currentTableIndex = 0;  // 當前表格索引
 const ROWS_PER_TABLE = 5;   // 每個表格最多顯示的行數
+let isPaused = false;  // 暫停狀態
+let timerStarted = false;  // 計時器是否已開始
+let pausedTime = 0;  // 暫停時累積的時間（毫秒）
+let lastPauseTime = 0;  // 最後一次暫停的時間點
 
 // Load version information when page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -244,6 +248,12 @@ function validateInput(input) {
 async function makeGuess() {
     if (gameOver) return;
     
+    // 檢查是否暫停中
+    if (isPaused) {
+        showMessage('遊戲已暫停，請先恢復遊戲。', 'error');
+        return;
+    }
+    
     if (!currentGameId) {
         showMessage('請先開始新遊戲。', 'error');
         return;
@@ -256,6 +266,11 @@ async function makeGuess() {
     if (errorMsg) {
         showMessage(errorMsg, 'error');
         return;
+    }
+    
+    // 在第一次猜測時開始計時
+    if (!timerStarted) {
+        startTimer();
     }
 
     try {
@@ -277,12 +292,13 @@ async function makeGuess() {
         const result = await response.json();
         guessCount++;
         document.getElementById('guessCount').textContent = guessCount;
-        const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
+        const elapsedSeconds = Math.round((Date.now() - startTime - pausedTime) / 1000);
         addToHistory(input, result.a, result.b, elapsedSeconds);
 
         if (result.game_completed) {
             gameOver = true;
             clearInterval(timerInterval);
+            updatePauseButton(); // 遊戲結束時禁用暫停按鈕
             lastGameResultId = result.ranking_id;
             showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${result.guess_count} 次，花了 ${Math.round(result.duration)} 秒。`, 'success');
             showVictoryAnimation(result.guess_count, Math.round(result.duration));
@@ -473,17 +489,89 @@ async function newGame() {
         document.getElementById('message').innerHTML = '';
         clearAllHistoryTables(); // 清除所有歷史表格
         
+        // 重置計時器狀態
         clearInterval(timerInterval);
-        startTime = Date.now();
-        document.getElementById('timer').textContent = '0';
-        timerInterval = setInterval(() => {
-            const elapsedSeconds = Math.round((Date.now() - startTime) / 1000);
-            document.getElementById('timer').textContent = elapsedSeconds;
-        }, 1000);
+        timerStarted = false;
+        isPaused = false;
+        pausedTime = 0;
+        lastPauseTime = 0;
+        document.getElementById('timer').textContent = '0 (輸入第一組數字後開始計時)';
+        updatePauseButton();
+        
+        // 啟用輸入框
+        document.getElementById('guessInput').disabled = false;
 
     } catch (error) {
         showMessage('無法開始新遊戲，請檢查後端服務是否啟動。', 'error');
     }
+}
+
+// 開始計時器
+function startTimer() {
+    if (timerStarted) return;
+    
+    timerStarted = true;
+    startTime = Date.now();
+    pausedTime = 0;
+    
+    timerInterval = setInterval(() => {
+        if (!isPaused) {
+            const elapsedSeconds = Math.round((Date.now() - startTime - pausedTime) / 1000);
+            document.getElementById('timer').textContent = elapsedSeconds + ' 秒';
+        }
+    }, 1000);
+    
+    // 立即更新顯示
+    document.getElementById('timer').textContent = '0 秒';
+    
+    // 啟用暫停按鈕
+    updatePauseButton();
+}
+
+// 切換暫停/恢復
+function togglePause() {
+    if (!timerStarted) {
+        showMessage('請先開始遊戲並進行第一次猜測。', 'error');
+        return;
+    }
+    
+    if (gameOver) {
+        showMessage('遊戲已結束。', 'error');
+        return;
+    }
+    
+    isPaused = !isPaused;
+    
+    if (isPaused) {
+        // 暫停：記錄暫停時間
+        lastPauseTime = Date.now();
+        document.getElementById('guessInput').disabled = true;
+        showMessage('⏸️ 遊戲已暫停', 'hint');
+    } else {
+        // 恢復：累加暫停時間
+        pausedTime += Date.now() - lastPauseTime;
+        document.getElementById('guessInput').disabled = false;
+        showMessage('▶️ 遊戲已恢復', 'hint');
+    }
+    
+    updatePauseButton();
+}
+
+// 更新暫停按鈕的顯示狀態
+function updatePauseButton() {
+    const pauseButton = document.getElementById('pauseButton');
+    if (!pauseButton) return;
+    
+    if (isPaused) {
+        pauseButton.textContent = '▶️ 繼續';
+        pauseButton.classList.add('paused');
+    } else {
+        pauseButton.textContent = '⏸️ 暫停';
+        pauseButton.classList.remove('paused');
+    }
+    
+    // 如果計時器還沒開始，禁用按鈕
+    pauseButton.disabled = !timerStarted || gameOver;
 }
 
 // 監聽Enter鍵

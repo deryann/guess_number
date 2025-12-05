@@ -292,6 +292,34 @@ button:disabled {
     transition: color 0.3s ease;
 }
 
+#pauseButton {
+    font-size: 1em;
+    padding: 10px 20px;
+    margin: 0 10px;
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    transition: all 0.2s ease;
+}
+
+#pauseButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+}
+
+#pauseButton.paused {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+}
+
+#pauseButton.paused:hover:not(:disabled) {
+    box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+}
+
+#pauseButton:disabled {
+    background: var(--button-disabled);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 /* 響應式設計 */
 @media (max-width: 1200px) {
     .history-table-container {
