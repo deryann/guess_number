@@ -601,6 +601,96 @@ button:disabled {
     }
 }
 
+/* Hint Modal Styles */
+.hint-modal {
+    position: fixed;
+    z-index: 3000;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+    }
+}
+
+.hint-modal-content {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    min-width: 250px;
+    max-width: 350px;
+    position: relative;
+    border: 3px solid #ffa500;
+}
+
+.hint-modal-content h3 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.hint-close-button {
+    color: #333;
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+    transition: color 0.2s;
+}
+
+.hint-close-button:hover {
+    color: #ff0000;
+}
+
+#hint-display {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.2em;
+    color: #333;
+    font-weight: bold;
+}
+
+#hint-display p {
+    margin: 10px 0;
+}
+
+#hint-display .hint-position {
+    color: #5a67d8;
+    font-size: 1.3em;
+}
+
+#hint-display .hint-digit {
+    color: #e53e3e;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+/* Responsive hint modal */
+@media (max-width: 768px) {
+    .hint-modal {
+        right: 10px;
+        left: 10px;
+        transform: translateY(-50%);
+    }
+    
+    .hint-modal-content {
+        max-width: 100%;
 /* ===== 設定按鈕樣式 ===== */
 #settings-button {
     background: #f0f0f0;

@@ -404,6 +404,63 @@ document.getElementById('guessInput').addEventListener('keypress', function(e) {
     }
 });
 
+// Hint functionality
+async function showHint(position) {
+    if (!currentGameId) {
+        showMessage('請先開始新遊戲。', 'error');
+        return;
+    }
+    
+    if (gameOver) {
+        showMessage('遊戲已結束。', 'error');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${API_URL}/hint/${currentGameId}/${position}`);
+        
+        if (!response.ok) {
+            throw new Error('Failed to get hint');
+        }
+        
+        const result = await response.json();
+        displayHint(result.position, result.digit);
+    } catch (error) {
+        showMessage('無法獲取提示，請稍後再試。', 'error');
+        console.error('Error getting hint:', error);
+    }
+}
+
+function displayHint(position, digit) {
+    const hintModal = document.getElementById('hint-modal');
+    const hintDisplay = document.getElementById('hint-display');
+    
+    hintDisplay.innerHTML = `
+        <p class="hint-position">第 ${position} 位數字</p>
+        <p class="hint-digit">${digit}</p>
+    `;
+    
+    hintModal.style.display = 'block';
+}
+
+function closeHintModal() {
+    const hintModal = document.getElementById('hint-modal');
+    hintModal.style.display = 'none';
+}
+
+// Keyboard event listener for hint hotkeys
+document.addEventListener('keydown', function(e) {
+    // Check if Ctrl key is pressed along with number keys 1-4
+    if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+        const key = e.key;
+        if (key >= '1' && key <= '4') {
+            e.preventDefault(); // Prevent default browser behavior
+            const position = parseInt(key);
+            showHint(position);
+        }
+    }
+});
+
 // Victory Animation Constants
 const ANIMATION_COLORS = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
 const FADE_DURATION_MS = 300;
