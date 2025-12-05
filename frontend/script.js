@@ -36,6 +36,11 @@ async function loadVersionInfo() {
 async function loadHomepageRanking() {
     try {
         const response = await fetch(`${API_URL}/ranking`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const rankingData = await response.json();
         const rankingList = document.getElementById('homepage-ranking-list');
         
@@ -46,7 +51,10 @@ async function loadHomepageRanking() {
         
         let tableHtml = '<table class="homepage-ranking-table"><thead><tr><th>排名</th><th>姓名</th><th>猜測次數</th><th>花費時間 (秒)</th></tr></thead><tbody>';
         rankingData.forEach((row, index) => {
-            tableHtml += `<tr><td>${index + 1}</td><td>${row.name}</td><td>${row.guess_count}</td><td>${row.duration}</td></tr>`;
+            const escapedName = escapeHtml(row.name);
+            const escapedGuessCount = escapeHtml(String(row.guess_count));
+            const escapedDuration = escapeHtml(String(row.duration));
+            tableHtml += `<tr><td>${index + 1}</td><td>${escapedName}</td><td>${escapedGuessCount}</td><td>${escapedDuration}</td></tr>`;
         });
         tableHtml += '</tbody></table>';
         rankingList.innerHTML = tableHtml;
@@ -56,6 +64,13 @@ async function loadHomepageRanking() {
         const rankingList = document.getElementById('homepage-ranking-list');
         rankingList.innerHTML = '<p class="error-text">無法載入排行榜</p>';
     }
+}
+
+// Escape HTML to prevent XSS attacks
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 function startGame() {
@@ -200,13 +215,21 @@ async function saveScore(name, startTime, endTime, duration, guessCount) {
 async function showRanking(highlightId) {
     try {
         const response = await fetch(`${API_URL}/ranking`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const rankingData = await response.json();
         const rankingList = document.getElementById('ranking-list');
         
         let tableHtml = '<table><tr><th>排名</th><th>姓名</th><th>猜測次數</th><th>花費時間 (秒)</th></tr>';
         rankingData.forEach((row, index) => {
             const isCurrent = row.id === highlightId;
-            tableHtml += `<tr id="rank-${row.id}" class="${isCurrent ? 'current-player' : ''}"><td>${index + 1}</td><td>${row.name}</td><td>${row.guess_count}</td><td>${row.duration}</td></tr>`;
+            const escapedName = escapeHtml(row.name);
+            const escapedGuessCount = escapeHtml(String(row.guess_count));
+            const escapedDuration = escapeHtml(String(row.duration));
+            tableHtml += `<tr id="rank-${row.id}" class="${isCurrent ? 'current-player' : ''}"><td>${index + 1}</td><td>${escapedName}</td><td>${escapedGuessCount}</td><td>${escapedDuration}</td></tr>`;
         });
         tableHtml += '</table>';
         rankingList.innerHTML = tableHtml;
