@@ -10,9 +10,10 @@ let currentGameId = null;  // Store the current game UUID
 let currentTableIndex = 0;  // 當前表格索引
 const ROWS_PER_TABLE = 5;   // 每個表格最多顯示的行數
 
-// Load version information when page loads
+// Load version information and homepage ranking when page loads
 document.addEventListener('DOMContentLoaded', function() {
     loadVersionInfo();
+    loadHomepageRanking();
 });
 
 async function loadVersionInfo() {
@@ -29,6 +30,31 @@ async function loadVersionInfo() {
     } catch (error) {
         console.error('Error loading version info:', error);
         document.getElementById('version-display').textContent = 'dev.dev';
+    }
+}
+
+async function loadHomepageRanking() {
+    try {
+        const response = await fetch(`${API_URL}/ranking`);
+        const rankingData = await response.json();
+        const rankingList = document.getElementById('homepage-ranking-list');
+        
+        if (rankingData.length === 0) {
+            rankingList.innerHTML = '<p class="no-data-text">暫無排行榜資料</p>';
+            return;
+        }
+        
+        let tableHtml = '<table class="homepage-ranking-table"><thead><tr><th>排名</th><th>姓名</th><th>猜測次數</th><th>花費時間 (秒)</th></tr></thead><tbody>';
+        rankingData.forEach((row, index) => {
+            tableHtml += `<tr><td>${index + 1}</td><td>${row.name}</td><td>${row.guess_count}</td><td>${row.duration}</td></tr>`;
+        });
+        tableHtml += '</tbody></table>';
+        rankingList.innerHTML = tableHtml;
+        
+    } catch (error) {
+        console.error('Failed to fetch homepage ranking:', error);
+        const rankingList = document.getElementById('homepage-ranking-list');
+        rankingList.innerHTML = '<p class="error-text">無法載入排行榜</p>';
     }
 }
 
