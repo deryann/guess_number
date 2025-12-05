@@ -1,6 +1,71 @@
 // 動態檢測 API URL，自動適應當前環境
 const API_URL = window.location.origin;
 let guessCount = 0;
+
+// ===== 符號設定 =====
+const DEFAULT_SYMBOLS = { a: 'A', b: 'B' };
+const SYMBOL_PRESETS = [
+    { a: 'A', b: 'B', name: '經典' },
+    { a: '🎯', b: '🔄', name: '目標' },
+    { a: '✅', b: '🔶', name: '勾選' },
+    { a: '🟢', b: '🟡', name: '圓點' },
+    { a: '⭐', b: '💫', name: '星星' },
+    { a: '🔥', b: '💨', name: '火焰' },
+];
+
+function getSymbolSettings() {
+    const saved = localStorage.getItem('guessNumberSymbols');
+    return saved ? JSON.parse(saved) : DEFAULT_SYMBOLS;
+}
+
+function saveSymbolSettings(aSymbol, bSymbol) {
+    localStorage.setItem('guessNumberSymbols', JSON.stringify({ a: aSymbol, b: bSymbol }));
+}
+
+function toggleSettingsModal(show) {
+    const modal = document.getElementById('settings-modal');
+    if (show) {
+        const symbols = getSymbolSettings();
+        document.getElementById('symbolA').value = symbols.a;
+        document.getElementById('symbolB').value = symbols.b;
+    }
+    modal.style.display = show ? 'block' : 'none';
+}
+
+function applyPreset(index) {
+    const preset = SYMBOL_PRESETS[index];
+    document.getElementById('symbolA').value = preset.a;
+    document.getElementById('symbolB').value = preset.b;
+}
+
+function saveSettings() {
+    const aSymbol = document.getElementById('symbolA').value.trim() || 'A';
+    const bSymbol = document.getElementById('symbolB').value.trim() || 'B';
+    saveSymbolSettings(aSymbol, bSymbol);
+    toggleSettingsModal(false);
+    refreshHistoryDisplay();
+    showMessage('設定已儲存！', 'success');
+}
+
+function resetSettings() {
+    document.getElementById('symbolA').value = DEFAULT_SYMBOLS.a;
+    document.getElementById('symbolB').value = DEFAULT_SYMBOLS.b;
+}
+
+function refreshHistoryDisplay() {
+    // 重新渲染所有歷史記錄以套用新符號
+    const symbols = getSymbolSettings();
+    document.querySelectorAll('.historyTable tbody tr').forEach(row => {
+        const resultCell = row.querySelector('.result');
+        if (resultCell && !resultCell.classList.contains('correct')) {
+            const text = resultCell.textContent;
+            const match = text.match(/(\d+)[^\d]+(\d+)/);
+            if (match) {
+                resultCell.textContent = `${match[1]}${symbols.a}${match[2]}${symbols.b}`;
+            }
+        }
+    });
+}
 let gameOver = false;
 let timerInterval;
 let startTime;
@@ -59,11 +124,15 @@ function toggleRankingModal(show) {
 window.onclick = function(event) {
     const rulesModal = document.getElementById('rules-modal');
     const rankingModal = document.getElementById('ranking-modal');
+    const settingsModal = document.getElementById('settings-modal');
     if (event.target == rulesModal) {
         toggleRulesModal(false);
     }
     if (event.target == rankingModal) {
         toggleRankingModal(false);
+    }
+    if (event.target == settingsModal) {
+        toggleSettingsModal(false);
     }
 }
 
@@ -138,7 +207,8 @@ async function makeGuess() {
             showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${result.guess_count} 次，花了 ${Math.round(result.duration)} 秒。`, 'success');
             showVictoryAnimation(result.guess_count, Math.round(result.duration));
         } else {
-            showMessage(`結果：${result.a}A${result.b}B，繼續加油！`, 'hint');
+            const symbols = getSymbolSettings();
+            showMessage(`結果：${result.a}${symbols.a}${result.b}${symbols.b}，繼續加油！`, 'hint');
         }
     } catch (error) {
         showMessage('發生錯誤，請稍後再試。', 'error');
@@ -261,7 +331,8 @@ function addToHistory(guess, a, b, time) {
     const historyTableBody = currentTable.querySelector('tbody');
     const historyRow = document.createElement('tr');
 
-    const resultText = a === 4 ? '🎉 正確！' : `${a}A${b}B`;
+    const symbols = getSymbolSettings();
+    const resultText = a === 4 ? '🎉 正確！' : `${a}${symbols.a}${b}${symbols.b}`;
     const resultClass = a === 4 ? 'correct' : 'hint';
 
     historyRow.innerHTML = `

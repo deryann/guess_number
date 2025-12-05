@@ -600,3 +600,167 @@ button:disabled {
         opacity: 0;
     }
 }
+
+/* ===== 設定按鈕樣式 ===== */
+#settings-button {
+    background: #f0f0f0;
+    color: #333;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5em;
+    padding: 0;
+    line-height: 40px;
+    text-align: center;
+}
+
+#settings-button:hover {
+    background: #e0e0e0;
+    transform: rotate(90deg);
+    transition: transform 0.3s ease;
+}
+
+/* ===== 設定 Modal 樣式 ===== */
+.settings-modal-content {
+    max-width: 450px;
+}
+
+.settings-description {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+}
+
+.symbol-settings {
+    text-align: left;
+}
+
+.symbol-input-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.symbol-input {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.symbol-input label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #5a67d8;
+    font-size: 0.9em;
+}
+
+.symbol-input input {
+    width: 60px;
+    height: 60px;
+    font-size: 2em;
+    text-align: center;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.symbol-input input:focus {
+    border-color: #5a67d8;
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.2);
+}
+
+.preset-section {
+    margin-bottom: 25px;
+}
+
+.preset-section h4 {
+    color: #5a67d8;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.preset-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+.preset-btn {
+    background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+    padding: 8px 12px;
+    font-size: 0.85em;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.preset-btn:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.settings-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(72, 187, 120, 0.4);
+}
+
+.reset-btn {
+    background: #f7fafc;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+    padding: 12px 24px;
+    font-size: 1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.reset-btn:hover {
+    background: #edf2f7;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 480px) {
+    .symbol-input-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .preset-buttons {
+        gap: 6px;
+    }
+    
+    .preset-btn {
+        padding: 6px 10px;
+        font-size: 0.8em;
+    }
+    
+    .settings-actions {
+        flex-direction: column;
+    }
+}
