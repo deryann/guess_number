@@ -691,6 +691,9 @@ button:disabled {
     
     .hint-modal-content {
         max-width: 100%;
+    }
+}
+
 /* ===== 設定按鈕樣式 ===== */
 #settings-button {
     background: #f0f0f0;
