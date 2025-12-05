@@ -336,7 +336,9 @@ document.getElementById('guessInput').addEventListener('keypress', function(e) {
 // Victory Animation Constants
 const ANIMATION_COLORS = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
 const FADE_DURATION_MS = 300;
+const CONFETTI_COUNT = 100;
 const CONFETTI_CLEANUP_MS = 5000;
+const FIREWORK_PARTICLE_COUNT = 30;
 const FIREWORK_CLEANUP_MS = 1000;
 
 // Victory Animation Functions
@@ -374,9 +376,7 @@ function showVictoryAnimation(guessCount, duration) {
 }
 
 function createConfetti() {
-    const confettiCount = 100;
-    
-    for (let i = 0; i < confettiCount; i++) {
+    for (let i = 0; i < CONFETTI_COUNT; i++) {
         const confetti = document.createElement('div');
         confetti.className = 'confetti';
         confetti.style.left = Math.random() * 100 + '%';
@@ -398,18 +398,17 @@ function createConfetti() {
 }
 
 function createFireworks() {
-    const particleCount = 30;
     const centerX = window.innerWidth * (0.2 + Math.random() * 0.6);
     const centerY = window.innerHeight * (0.2 + Math.random() * 0.4);
     
-    for (let i = 0; i < particleCount; i++) {
+    for (let i = 0; i < FIREWORK_PARTICLE_COUNT; i++) {
         const particle = document.createElement('div');
         particle.className = 'firework';
         particle.style.backgroundColor = ANIMATION_COLORS[Math.floor(Math.random() * ANIMATION_COLORS.length)];
         particle.style.left = centerX + 'px';
         particle.style.top = centerY + 'px';
         
-        const angle = (Math.PI * 2 * i) / particleCount;
+        const angle = (Math.PI * 2 * i) / FIREWORK_PARTICLE_COUNT;
         const velocity = 100 + Math.random() * 100;
         const tx = Math.cos(angle) * velocity;
         const ty = Math.sin(angle) * velocity;
