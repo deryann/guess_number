@@ -136,7 +136,7 @@ async function makeGuess() {
             clearInterval(timerInterval);
             lastGameResultId = result.ranking_id;
             showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${result.guess_count} 次，花了 ${Math.round(result.duration)} 秒。`, 'success');
-            showRanking(lastGameResultId);
+            showVictoryAnimation(result.guess_count, Math.round(result.duration));
         } else {
             showMessage(`結果：${result.a}A${result.b}B，繼續加油！`, 'hint');
         }
@@ -332,4 +332,127 @@ document.getElementById('guessInput').addEventListener('keypress', function(e) {
         makeGuess();
     }
 });
+
+// Victory Animation Functions
+function showVictoryAnimation(guessCount, duration) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.className = 'victory-overlay';
+    overlay.id = 'victory-overlay';
+    
+    // Create content
+    const content = document.createElement('div');
+    content.className = 'victory-content';
+    content.innerHTML = `
+        <div class="trophy">🏆</div>
+        <h2>🎉 恭喜過關！ 🎉</h2>
+        <div class="victory-stats">
+            <p>玩家：${playerName}</p>
+            <p>猜測次數：${guessCount} 次</p>
+            <p>花費時間：${duration} 秒</p>
+        </div>
+        <button class="victory-button" onclick="closeVictoryAnimation()">查看排行榜</button>
+        <button class="victory-button" onclick="closeVictoryAndNewGame()">再來一局</button>
+    `;
+    
+    overlay.appendChild(content);
+    document.body.appendChild(overlay);
+    
+    // Create confetti
+    createConfetti();
+    
+    // Create fireworks
+    setTimeout(() => createFireworks(), 300);
+    setTimeout(() => createFireworks(), 600);
+    setTimeout(() => createFireworks(), 900);
+}
+
+function createConfetti() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
+    const confettiCount = 100;
+    
+    for (let i = 0; i < confettiCount; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.top = -10 + 'px';
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.animation = `confettiFall ${2 + Math.random() * 3}s linear forwards`;
+        confetti.style.animationDelay = Math.random() * 0.5 + 's';
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        
+        document.body.appendChild(confetti);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (confetti.parentNode) {
+                confetti.parentNode.removeChild(confetti);
+            }
+        }, 5000);
+    }
+}
+
+function createFireworks() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500'];
+    const particleCount = 30;
+    const centerX = window.innerWidth * (0.2 + Math.random() * 0.6);
+    const centerY = window.innerHeight * (0.2 + Math.random() * 0.4);
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firework';
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.left = centerX + 'px';
+        particle.style.top = centerY + 'px';
+        
+        const angle = (Math.PI * 2 * i) / particleCount;
+        const velocity = 100 + Math.random() * 100;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+        
+        particle.style.animation = `fireworkExplode 1s ease-out forwards`;
+        particle.style.setProperty('--tx', tx + 'px');
+        particle.style.setProperty('--ty', ty + 'px');
+        
+        // Apply transform
+        setTimeout(() => {
+            particle.style.transform = `translate(${tx}px, ${ty}px)`;
+        }, 10);
+        
+        document.body.appendChild(particle);
+        
+        // Remove after animation
+        setTimeout(() => {
+            if (particle.parentNode) {
+                particle.parentNode.removeChild(particle);
+            }
+        }, 1000);
+    }
+}
+
+function closeVictoryAnimation() {
+    const overlay = document.getElementById('victory-overlay');
+    if (overlay) {
+        overlay.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+            showRanking(lastGameResultId);
+        }, 300);
+    }
+}
+
+function closeVictoryAndNewGame() {
+    const overlay = document.getElementById('victory-overlay');
+    if (overlay) {
+        overlay.style.animation = 'fadeOut 0.3s ease-out';
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+            newGame();
+        }, 300);
+    }
+}
 
