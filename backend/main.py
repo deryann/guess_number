@@ -259,6 +259,48 @@ def get_hint(game_id: str, position: int):
     
     return {"position": position, "digit": digit}
 
+@app.post("/surrender/{game_id}")
+def surrender_game(game_id: str):
+    """Surrender the current game and get the answer with guess history"""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get game session
+    cursor.execute("SELECT answer, is_completed FROM games WHERE game_id = ?", (game_id,))
+    game_row = cursor.fetchone()
+    
+    if not game_row:
+        conn.close()
+        raise HTTPException(status_code=404, detail="Game not found.")
+    
+    if game_row[1]:  # is_completed
+        conn.close()
+        raise HTTPException(status_code=400, detail="Game already completed.")
+    
+    answer = game_row[0]
+    
+    # Mark game as completed (but don't save to rankings)
+    surrender_time = datetime.now().isoformat()
+    cursor.execute(
+        "UPDATE games SET is_completed = TRUE, completed_time = ? WHERE game_id = ?",
+        (surrender_time, game_id)
+    )
+    
+    # Get all previous guesses
+    cursor.execute(
+        "SELECT guess_number, result_a, result_b FROM game_history WHERE game_id = ? ORDER BY id ASC",
+        (game_id,)
+    )
+    history = cursor.fetchall()
+    
+    conn.commit()
+    conn.close()
+    
+    return {
+        "answer": answer,
+        "history": [{"guess": row[0], "a": row[1], "b": row[2]} for row in history]
+    }
+
 # Admin endpoints
 @app.get("/admin")
 def admin_page():
