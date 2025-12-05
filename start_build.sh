@@ -39,7 +39,7 @@ if [ $? -eq 0 ]; then
     echo "  - deryannhuang/guess_number:latest"
     echo ""
     echo "To run the container:"
-    echo "  docker run -p 8000:8000 ${IMAGE_NAME}:latest"
+    echo "  docker run -p 12527:12527 ${IMAGE_NAME}:latest"
 else
     echo "❌ Docker build failed!"
     exit 1

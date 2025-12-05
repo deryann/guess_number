@@ -36,7 +36,7 @@ python database_setup.py
 
 # Run backend server
 cd backend
-uvicorn main:app --reload
+uvicorn main:app --reload --port 12527
 
 # Frontend: Open frontend/index.html in browser
 ```
@@ -48,7 +48,7 @@ chmod +x start_build.sh
 ./start_build.sh
 
 # Run container
-docker run -p 8000:8000 guess-number-game:latest
+docker run -p 12527:12527 guess-number-game:latest
 ```
 
 ### Testing

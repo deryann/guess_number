@@ -8,7 +8,7 @@ let rankings = [];
 // 動態檢測 API URL
 function getApiUrl() {
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        return 'http://localhost:8000';
+        return 'http://localhost:12527';
     } else {
         return window.location.origin;
     }

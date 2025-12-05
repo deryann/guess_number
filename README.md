@@ -53,7 +53,7 @@ chmod +x start_build.sh
 
 **2. 運行容器:**
 ```bash
-docker run -p 8000:8000 guess-number-game:latest
+docker run -p 12527:12527 guess-number-game:latest
 ```
 
 **3. 使用 Docker Compose (可選):**
@@ -67,7 +67,7 @@ docker-compose up -d
 ```
 
 **4. 存取應用程式:**
-開啟瀏覽器並前往 `http://localhost:8000`
+開啟瀏覽器並前往 `http://localhost:12527`
 
 ### 方式二：傳統本機部署
 
@@ -99,9 +99,9 @@ docker-compose up -d
 
 1.  在 `backend` 目錄下，執行以下指令來啟動 FastAPI 服務：
     ```bash
-    uvicorn main:app --reload
+    uvicorn main:app --reload --port 12527
     ```
-2.  伺服器將會運行在 `http://127.0.0.1:8000`。請保持此終端機視窗開啟。
+2.  伺服器將會運行在 `http://127.0.0.1:12527`。請保持此終端機視窗開啟。
 
 #### 2. 前端 (Frontend)
 
