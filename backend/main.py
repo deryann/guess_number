@@ -224,6 +224,32 @@ def get_version():
         "version": f"{MAIN_VERSION}.{MINOR_VERSION}"
     }
 
+@app.get("/hint/{game_id}/{position}")
+def get_hint(game_id: str, position: int):
+    """Get hint for a specific digit position (1-4)"""
+    if position < 1 or position > 4:
+        raise HTTPException(status_code=400, detail="Position must be between 1 and 4")
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Get game session
+    cursor.execute("SELECT answer, is_completed FROM games WHERE game_id = ?", (game_id,))
+    game_row = cursor.fetchone()
+    conn.close()
+    
+    if not game_row:
+        raise HTTPException(status_code=404, detail="Game not found.")
+    
+    if game_row[1]:  # is_completed
+        raise HTTPException(status_code=400, detail="Game already completed.")
+    
+    answer = game_row[0]
+    # Position is 1-indexed, convert to 0-indexed for array access
+    digit = answer[position - 1]
+    
+    return {"position": position, "digit": digit}
+
 # Admin endpoints
 @app.get("/admin")
 def admin_page():
