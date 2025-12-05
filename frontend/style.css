@@ -990,139 +990,24 @@ button:disabled {
     }
 }
 
-/* ===== Homepage Ranking Styles ===== */
-.homepage-ranking {
-    margin-top: 30px;
-    padding-top: 25px;
-    border-top: 2px solid #e2e8f0;
-    text-align: center;
-}
-
-.homepage-ranking h3 {
-    color: var(--primary-color);
-    margin-bottom: 20px;
-    font-size: 1.5em;
-    transition: color 0.3s ease;
-}
-
-#homepage-ranking-list {
-    max-height: 400px;
-    overflow-y: auto;
-    margin: 0 auto;
-}
-
-.ranking-loading {
-    color: var(--text-secondary);
-    padding: 20px;
-    font-style: italic;
-    transition: color 0.3s ease;
-}
-
-.ranking-error {
-    color: var(--error-color);
-    padding: 20px;
-    background: var(--error-bg);
-    border-radius: 8px;
-    margin: 10px 0;
-    transition: color 0.3s ease, background 0.3s ease;
-}
-
-#homepage-ranking-list table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    background: var(--container-bg);
-    transition: background 0.3s ease;
-}
-
-#homepage-ranking-list th,
-#homepage-ranking-list td {
-    border: 1px solid var(--border-color);
-    padding: 12px 8px;
-    text-align: center;
-    transition: border-color 0.3s ease;
-}
-
-#homepage-ranking-list th {
-    background: linear-gradient(135deg, var(--button-gradient-start) 0%, var(--button-gradient-end) 100%);
+/* ===== Homepage Ranking Button Styles ===== */
+#homepage-ranking-button {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     color: white;
-    font-weight: 600;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-#homepage-ranking-list tbody tr:nth-child(odd) {
-    background-color: var(--table-row-even);
-    transition: background-color 0.3s ease;
-}
-
-#homepage-ranking-list tbody tr:hover {
-    background-color: var(--table-row-hover);
-    transition: background-color 0.2s ease;
-}
-
-#homepage-ranking-list tbody tr td:first-child {
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.2em;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 10px;
     font-weight: bold;
-    color: var(--primary-color);
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(255, 165, 0, 0.3);
 }
 
-/* Medal icons for top 3 */
-#homepage-ranking-list tbody tr:nth-child(1) td:first-child::before {
-    content: '🥇 ';
-}
-
-#homepage-ranking-list tbody tr:nth-child(2) td:first-child::before {
-    content: '🥈 ';
-}
-
-#homepage-ranking-list tbody tr:nth-child(3) td:first-child::before {
-    content: '🥉 ';
-}
-
-/* Scrollbar styling for ranking list */
-#homepage-ranking-list::-webkit-scrollbar {
-    width: 8px;
-}
-
-#homepage-ranking-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-#homepage-ranking-list::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 4px;
-}
-
-#homepage-ranking-list::-webkit-scrollbar-thumb:hover {
-    background: #a1a1a1;
-}
-
-/* Responsive design for homepage ranking */
-@media (max-width: 768px) {
-    #homepage-ranking-list {
-        max-height: 300px;
-    }
-    
-    #homepage-ranking-list th,
-    #homepage-ranking-list td {
-        padding: 10px 6px;
-        font-size: 0.9em;
-    }
-}
-
-@media (max-width: 480px) {
-    .homepage-ranking h3 {
-        font-size: 1.3em;
-    }
-    
-    #homepage-ranking-list th,
-    #homepage-ranking-list td {
-        padding: 8px 4px;
-        font-size: 0.85em;
-    }
+#homepage-ranking-button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 16px rgba(255, 165, 0, 0.5);
 }
 
 /* ===== 主題切換器樣式 ===== */
