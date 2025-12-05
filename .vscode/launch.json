@@ -12,7 +12,9 @@
             "module": "uvicorn",
             "args": [
                 "main:app",
-                "--reload"
+                "--reload",
+                "--port",
+                "12527"
             ],
             "jinja": true,
             "cwd": "${workspaceFolder}/backend",
