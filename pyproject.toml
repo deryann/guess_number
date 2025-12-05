@@ -1,0 +1,16 @@
+[project]
+name = "guess-number-game"
+version = "0.1.0"
+description = "Classic 4A0B number guessing game with FastAPI backend"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "python-multipart",
+]
+
+[tool.uv]
+dev-dependencies = []
+
+[tool.uv.sources]
