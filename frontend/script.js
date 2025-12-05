@@ -333,6 +333,12 @@ document.getElementById('guessInput').addEventListener('keypress', function(e) {
     }
 });
 
+// Victory Animation Constants
+const ANIMATION_COLORS = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
+const FADE_DURATION_MS = 300;
+const CONFETTI_CLEANUP_MS = 5000;
+const FIREWORK_CLEANUP_MS = 1000;
+
 // Victory Animation Functions
 function showVictoryAnimation(guessCount, duration) {
     // Create overlay
@@ -368,7 +374,6 @@ function showVictoryAnimation(guessCount, duration) {
 }
 
 function createConfetti() {
-    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
     const confettiCount = 100;
     
     for (let i = 0; i < confettiCount; i++) {
@@ -376,7 +381,7 @@ function createConfetti() {
         confetti.className = 'confetti';
         confetti.style.left = Math.random() * 100 + '%';
         confetti.style.top = -10 + 'px';
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.backgroundColor = ANIMATION_COLORS[Math.floor(Math.random() * ANIMATION_COLORS.length)];
         confetti.style.animation = `confettiFall ${2 + Math.random() * 3}s linear forwards`;
         confetti.style.animationDelay = Math.random() * 0.5 + 's';
         confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
@@ -388,12 +393,11 @@ function createConfetti() {
             if (confetti.parentNode) {
                 confetti.parentNode.removeChild(confetti);
             }
-        }, 5000);
+        }, CONFETTI_CLEANUP_MS);
     }
 }
 
 function createFireworks() {
-    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500'];
     const particleCount = 30;
     const centerX = window.innerWidth * (0.2 + Math.random() * 0.6);
     const centerY = window.innerHeight * (0.2 + Math.random() * 0.4);
@@ -401,7 +405,7 @@ function createFireworks() {
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
         particle.className = 'firework';
-        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.backgroundColor = ANIMATION_COLORS[Math.floor(Math.random() * ANIMATION_COLORS.length)];
         particle.style.left = centerX + 'px';
         particle.style.top = centerY + 'px';
         
@@ -421,33 +425,28 @@ function createFireworks() {
             if (particle.parentNode) {
                 particle.parentNode.removeChild(particle);
             }
-        }, 1000);
+        }, FIREWORK_CLEANUP_MS);
+    }
+}
+
+function closeOverlayWithAnimation(callback) {
+    const overlay = document.getElementById('victory-overlay');
+    if (overlay) {
+        overlay.style.animation = `fadeOut ${FADE_DURATION_MS}ms ease-out`;
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+            if (callback) callback();
+        }, FADE_DURATION_MS);
     }
 }
 
 function closeVictoryAnimation() {
-    const overlay = document.getElementById('victory-overlay');
-    if (overlay) {
-        overlay.style.animation = 'fadeOut 0.3s ease-out';
-        setTimeout(() => {
-            if (overlay.parentNode) {
-                overlay.parentNode.removeChild(overlay);
-            }
-            showRanking(lastGameResultId);
-        }, 300);
-    }
+    closeOverlayWithAnimation(() => showRanking(lastGameResultId));
 }
 
 function closeVictoryAndNewGame() {
-    const overlay = document.getElementById('victory-overlay');
-    if (overlay) {
-        overlay.style.animation = 'fadeOut 0.3s ease-out';
-        setTimeout(() => {
-            if (overlay.parentNode) {
-                overlay.parentNode.removeChild(overlay);
-            }
-            newGame();
-        }, 300);
-    }
+    closeOverlayWithAnimation(() => newGame());
 }
 
