@@ -4,64 +4,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>猜數字遊戲</title>
+    <title data-i18n="pageTitle">猜數字遊戲</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div id="start-screen">
-        <h1>🎯 猜數字遊戲</h1>
-        <p class="subtitle">經典的邏輯推理遊戲</p>
+        <h1><span class="emoji-icon">🎯</span> <span data-i18n="startScreen.title">猜數字遊戲</span></h1>
+        <p class="subtitle" data-i18n="startScreen.subtitle">經典的邏輯推理遊戲</p>
         <div class="rules" id="start-screen-rules">
-            <h3>🎮 遊戲規則：</h3>
+            <h3><span class="emoji-icon">🎮</span> <span data-i18n="rules.title">遊戲規則：</span></h3>
             <ul>
-                <li>系統會隨機產生一個4位數字（0-9，不重複）</li>
-                <li>你需要猜出這個數字的正確順序</li>
-                <li><strong class="symbol-a">A</strong>：數字和位置都正確的個數</li>
-                <li><strong class="symbol-b">B</strong>：數字正確但位置錯誤的個數</li>
-                <li>當你得到 <strong class="symbol-win">4A0B</strong> 時就獲勝了！</li>
+                <li data-i18n="rules.rule1">系統會隨機產生一個4位數字（0-9，不重複）</li>
+                <li data-i18n="rules.rule2">你需要猜出這個數字的正確順序</li>
+                <li><strong class="symbol-a">A</strong><span data-i18n="rules.rule3_suffix">：數字和位置都正確的個數</span></li>
+                <li><strong class="symbol-b">B</strong><span data-i18n="rules.rule4_suffix">：數字正確但位置錯誤的個數</span></li>
+                <li><span data-i18n="rules.rule5_prefix">當你得到 </span><strong class="symbol-win">4A0B</strong><span data-i18n="rules.rule5_suffix"> 時就獲勝了！</span></li>
             </ul>
         </div>
-        <input type="text" id="playerName" placeholder="請輸入您的姓名">
-        <button onclick="startGame()">開始遊戲</button>
-        <button id="homepage-ranking-button" onclick="showRanking()">🏆 查看排行榜</button>
+        <input type="text" id="playerName" data-i18n-placeholder="startScreen.playerNamePlaceholder" placeholder="請輸入您的姓名">
+        <button onclick="startGame()" data-i18n="startScreen.startButton">開始遊戲</button>
+        <button id="homepage-ranking-button" onclick="showRanking()"><span class="emoji-icon">🏆</span> <span data-i18n="startScreen.rankingButton">查看排行榜</span></button>
 
-        <!-- Theme Switcher -->
-        <div class="theme-switcher">
-            <h4>🎨 主題切換</h4>
-            <div class="theme-buttons">
-                <button class="theme-btn active" data-theme="original">原版模式</button>
-                <button class="theme-btn" data-theme="dark">暗黑模式</button>
-                <button class="theme-btn" data-theme="special">特殊配色</button>
+        <!-- Compact Settings Bar -->
+        <div class="compact-settings">
+            <!-- Language Dropdown -->
+            <div class="dropdown" id="lang-dropdown">
+                <button class="dropdown-toggle" onclick="toggleDropdown('lang-dropdown')" data-i18n-title="language.title" title="語言">
+                    🌐
+                </button>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item lang-btn" data-lang="zh_tw" onclick="selectLanguage('zh_tw')">繁體中文</button>
+                    <button class="dropdown-item lang-btn" data-lang="en" onclick="selectLanguage('en')">English</button>
+                </div>
+            </div>
+
+            <!-- Theme Dropdown -->
+            <div class="dropdown" id="theme-dropdown">
+                <button class="dropdown-toggle" onclick="toggleDropdown('theme-dropdown')" data-i18n-title="theme.title" title="主題">
+                    🎨
+                </button>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item theme-btn active" data-theme="original" onclick="selectTheme('original')" data-i18n="theme.original">原版模式</button>
+                    <button class="dropdown-item theme-btn" data-theme="dark" onclick="selectTheme('dark')" data-i18n="theme.dark">暗黑模式</button>
+                    <button class="dropdown-item theme-btn" data-theme="special" onclick="selectTheme('special')" data-i18n="theme.special">特殊配色</button>
+                </div>
             </div>
         </div>
-        
+
         <div class="admin-link">
-            <a href="/admin">🔐 管理員入口</a>
+            <a href="/admin"><span class="emoji-icon">🔐</span> <span data-i18n="startScreen.adminLink">管理員入口</span></a>
         </div>
     </div>
 
     <div class="game-container" style="display: none;">
         <div class="game-header">
-            <h1>猜數字</h1>
-            <button id="settings-button" onclick="toggleSettingsModal(true)" title="符號設定">⚙️</button>
+            <h1 data-i18n="game.title">猜數字</h1>
+            <button id="settings-button" onclick="toggleSettingsModal(true)" data-i18n-title="game.settingsTitle" title="符號設定">⚙️</button>
             <button id="ranking-button" onclick="showRanking()">🏆</button>
             <button id="help-button" onclick="toggleRulesModal(true)">?</button>
         </div>
         <div class="game-stats">
-            <span><strong>玩家：</strong><span id="playerNameDisplay"></span></span>
-            <span><strong>目前猜測次數：</strong> <span id="guessCount">0</span></span>
-            <span><strong>經過時間：</strong> <span id="timer">0</span></span>
-            <button id="pauseButton" onclick="togglePause()" disabled>⏸️ 暫停</button>
+            <span><strong data-i18n="game.player">玩家：</strong><span id="playerNameDisplay"></span></span>
+            <span><strong data-i18n="game.guessCount">目前猜測次數：</strong> <span id="guessCount">0</span></span>
+            <span><strong data-i18n="game.elapsedTime">經過時間：</strong> <span id="timer">0</span></span>
+            <button id="pauseButton" onclick="togglePause()" disabled><span class="emoji-icon">⏸️</span> <span id="pauseButtonText" data-i18n="game.pauseButton">暫停</span></button>
         </div>
         <div class="history" id="historyContainer">
             <!-- 多個表格將動態產生在這裡 -->
         </div>
         <div class="input-section">
-            <input type="text" id="guessInput" placeholder="輸入4位數字 (支援全形/半形)" maxlength="4">
+            <input type="text" id="guessInput" data-i18n-placeholder="game.guessInputPlaceholder" placeholder="輸入4位數字 (支援全形/半形)" maxlength="4">
             <br>
-            <button onclick="makeGuess()">猜測</button>
-            <button id="surrenderButton" onclick="surrenderGame()" style="display: none;">投降</button>
-            <button onclick="newGame()">新遊戲</button>
+            <button onclick="makeGuess()" data-i18n="game.guessButton">猜測</button>
+            <button id="surrenderButton" onclick="surrenderGame()" style="display: none;" data-i18n="game.surrenderButton">投降</button>
+            <button onclick="newGame()" data-i18n="game.newGameButton">新遊戲</button>
         </div>
         <div id="message"></div>
     </div>
@@ -69,13 +85,13 @@
     <div id="rules-modal" class="modal" style="display: none;">
         <div class="modal-content" id="rules-modal-content">
             <span class="close-button" onclick="toggleRulesModal(false)">&times;</span>
-            <h3>🎮 遊戲規則：</h3>
+            <h3><span class="emoji-icon">🎮</span> <span data-i18n="rules.title">遊戲規則：</span></h3>
             <ul>
-                <li>系統會隨機產生一個4位數字（0-9，不重複）</li>
-                <li>你需要猜出這個數字的正確順序</li>
-                <li><strong class="symbol-a">A</strong>：數字和位置都正確的個數</li>
-                <li><strong class="symbol-b">B</strong>：數字正確但位置錯誤的個數</li>
-                <li>當你得到 <strong class="symbol-win">4A0B</strong> 時就獲勝了！</li>
+                <li data-i18n="rules.rule1">系統會隨機產生一個4位數字（0-9，不重複）</li>
+                <li data-i18n="rules.rule2">你需要猜出這個數字的正確順序</li>
+                <li><strong class="symbol-a">A</strong><span data-i18n="rules.rule3_suffix">：數字和位置都正確的個數</span></li>
+                <li><strong class="symbol-b">B</strong><span data-i18n="rules.rule4_suffix">：數字正確但位置錯誤的個數</span></li>
+                <li><span data-i18n="rules.rule5_prefix">當你得到 </span><strong class="symbol-win">4A0B</strong><span data-i18n="rules.rule5_suffix"> 時就獲勝了！</span></li>
             </ul>
         </div>
     </div>
@@ -84,7 +100,7 @@
     <div id="ranking-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span class="close-button" onclick="toggleRankingModal(false)">&times;</span>
-            <h2>🏆 排行榜 (TOP 10)</h2>
+            <h2><span class="emoji-icon">🏆</span> <span data-i18n="ranking.title">排行榜 (TOP 10)</span></h2>
             <div id="ranking-list">
                 <!-- Ranking content will be injected here -->
             </div>
@@ -95,7 +111,7 @@
     <div id="hint-modal" class="hint-modal" style="display: none;">
         <div class="hint-modal-content">
             <span class="hint-close-button" onclick="closeHintModal()">&times;</span>
-            <h3>💡 提示</h3>
+            <h3><span class="emoji-icon">💡</span> <span data-i18n="hint.title">提示</span></h3>
             <div id="hint-display">
             </div>
         </div>
@@ -105,33 +121,33 @@
     <div id="settings-modal" class="modal" style="display: none;">
         <div class="modal-content settings-modal-content">
             <span class="close-button" onclick="toggleSettingsModal(false)">&times;</span>
-            <h2>⚙️ 符號設定</h2>
-            <p class="settings-description">自訂遊戲結果顯示的符號，讓遊戲更有個人風格！</p>
+            <h2><span class="emoji-icon">⚙️</span> <span data-i18n="settings.title">符號設定</span></h2>
+            <p class="settings-description" data-i18n="settings.description">自訂遊戲結果顯示的符號，讓遊戲更有個人風格！</p>
             <div class="symbol-settings">
                 <div class="symbol-input-group">
                     <div class="symbol-input">
-                        <label for="symbolA">正確位置符號：</label>
+                        <label for="symbolA" data-i18n="settings.symbolALabel">正確位置符號：</label>
                         <input type="text" id="symbolA" maxlength="2" value="A" placeholder="A">
                     </div>
                     <div class="symbol-input">
-                        <label for="symbolB">錯誤位置符號：</label>
+                        <label for="symbolB" data-i18n="settings.symbolBLabel">錯誤位置符號：</label>
                         <input type="text" id="symbolB" maxlength="2" value="B" placeholder="B">
                     </div>
                 </div>
                 <div class="preset-section">
-                    <h4>快速選擇：</h4>
+                    <h4 data-i18n="settings.presetTitle">快速選擇：</h4>
                     <div class="preset-buttons">
-                        <button class="preset-btn" onclick="applyPreset(0)">A/B 經典</button>
-                        <button class="preset-btn" onclick="applyPreset(1)">🎯/🔄 目標</button>
-                        <button class="preset-btn" onclick="applyPreset(2)">✅/🔶 勾選</button>
-                        <button class="preset-btn" onclick="applyPreset(3)">🟢/🟡 圓點</button>
-                        <button class="preset-btn" onclick="applyPreset(4)">⭐/💫 星星</button>
-                        <button class="preset-btn" onclick="applyPreset(5)">🔥/💨 火焰</button>
+                        <button class="preset-btn" onclick="applyPreset(0)" data-i18n="settings.presetClassic">A/B 經典</button>
+                        <button class="preset-btn" onclick="applyPreset(1)">🎯/🔄 <span data-i18n="settings.presetTarget">目標</span></button>
+                        <button class="preset-btn" onclick="applyPreset(2)">✅/🔶 <span data-i18n="settings.presetCheck">勾選</span></button>
+                        <button class="preset-btn" onclick="applyPreset(3)">🟢/🟡 <span data-i18n="settings.presetDot">圓點</span></button>
+                        <button class="preset-btn" onclick="applyPreset(4)">⭐/💫 <span data-i18n="settings.presetStar">星星</span></button>
+                        <button class="preset-btn" onclick="applyPreset(5)">🔥/💨 <span data-i18n="settings.presetFlame">火焰</span></button>
                     </div>
                 </div>
                 <div class="settings-actions">
-                    <button class="save-btn" onclick="saveSettings()">💾 儲存設定</button>
-                    <button class="reset-btn" onclick="resetSettings()">↩️ 恢復預設</button>
+                    <button class="save-btn" onclick="saveSettings()"><span class="emoji-icon">💾</span> <span data-i18n="settings.saveButton">儲存設定</span></button>
+                    <button class="reset-btn" onclick="resetSettings()"><span class="emoji-icon">↩️</span> <span data-i18n="settings.resetButton">恢復預設</span></button>
                 </div>
             </div>
         </div>
@@ -140,10 +156,14 @@
     <!-- Footer with version information -->
     <footer id="version-footer">
         <div class="version-info">
-            版本: <span id="version-display">載入中...</span>
+            <span data-i18n="footer.version">版本：</span><span id="version-display" data-i18n="footer.loading">載入中...</span>
         </div>
     </footer>
 
+    <!-- i18n scripts - must load before main script -->
+    <script src="/static/i18n/i18n.js"></script>
+    <script src="/static/i18n/zh_tw.js"></script>
+    <script src="/static/i18n/en.js"></script>
     <script src="/static/script.js"></script>
 </body>
 </html>

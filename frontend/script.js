@@ -45,7 +45,7 @@ function saveSettings() {
     toggleSettingsModal(false);
     refreshHistoryDisplay();
     updateRulesDisplay();
-    showMessage('設定已儲存！', 'success');
+    showMessage(i18n.t('messages.settingsSaved'), 'success');
 }
 
 function resetSettings() {
@@ -102,9 +102,19 @@ let lastPauseTime = 0;  // 最後一次暫停的時間點
 
 // Load version information when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize i18n first
+    i18n.init();
+
     loadVersionInfo();
     initializeTheme();
     updateRulesDisplay();
+});
+
+// Listen for language changes to update dynamic content
+window.addEventListener('languageChanged', function() {
+    // Update dynamic elements that aren't covered by data-i18n
+    updateTimerDisplay();
+    updatePauseButton();
 });
 
 async function loadVersionInfo() {
@@ -131,7 +141,12 @@ function createRankingTable(rankingData, includeIdColumn = false) {
     // Create header
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
-    const headers = ['排名', '姓名', '猜測次數', '花費時間 (秒)'];
+    const headers = [
+        i18n.t('ranking.headerRank'),
+        i18n.t('ranking.headerName'),
+        i18n.t('ranking.headerGuessCount'),
+        i18n.t('ranking.headerDuration')
+    ];
     headers.forEach(headerText => {
         const th = document.createElement('th');
         th.textContent = headerText;
@@ -178,7 +193,7 @@ function createRankingTable(rankingData, includeIdColumn = false) {
 function startGame() {
     playerName = document.getElementById('playerName').value;
     if (!playerName) {
-        alert('請輸入您的姓名！');
+        alert(i18n.t('messages.enterName'));
         return;
     }
 
@@ -225,15 +240,15 @@ function convertToHalfWidth(str) {
 function validateInput(input) {
     input = convertToHalfWidth(input);
     if (input.length !== 4) {
-        return '請輸入4位數字！';
+        return i18n.t('messages.enterFourDigits');
     }
     if (!/^\d{4}$/.test(input)) {
-        return '請只輸入數字！';
+        return i18n.t('messages.digitsOnly');
     }
     const digits = input.split('');
     const uniqueDigits = [...new Set(digits)];
     if (uniqueDigits.length !== 4) {
-        return '數字不能重複！';
+        return i18n.t('messages.noRepeat');
     }
     return null;
 }
@@ -244,12 +259,12 @@ async function makeGuess() {
     
     // 檢查是否暫停中
     if (isPaused) {
-        showMessage('遊戲已暫停，請先恢復遊戲。', 'error');
+        showMessage(i18n.t('messages.gameIsPaused'), 'error');
         return;
     }
-    
+
     if (!currentGameId) {
-        showMessage('請先開始新遊戲。', 'error');
+        showMessage(i18n.t('messages.startNewGame'), 'error');
         return;
     }
 
@@ -297,14 +312,25 @@ async function makeGuess() {
             updatePauseButton(); // 遊戲結束時禁用暫停按鈕
             document.getElementById('surrenderButton').style.display = 'none'; // Hide surrender button
             lastGameResultId = result.ranking_id;
-            showMessage(`🎉 恭喜 ${playerName}！你猜對了！你總共猜了 ${result.guess_count} 次，花了 ${Math.round(result.duration)} 秒。`, 'success');
+            const congratsMsg = i18n.t('messages.congratulations', {
+                playerName: playerName,
+                guessCount: result.guess_count,
+                duration: Math.round(result.duration)
+            });
+            showMessage(`🎉 ${congratsMsg}`, 'success');
             showVictoryAnimation(result.guess_count, Math.round(result.duration));
         } else {
             const symbols = getSymbolSettings();
-            showMessage(`結果：${result.a}${symbols.a}${result.b}${symbols.b}，繼續加油！`, 'hint');
+            const resultMsg = i18n.t('messages.resultKeepGoing', {
+                a: result.a,
+                symbolA: symbols.a,
+                b: result.b,
+                symbolB: symbols.b
+            });
+            showMessage(resultMsg, 'hint');
         }
     } catch (error) {
-        showMessage('發生錯誤，請稍後再試。', 'error');
+        showMessage(i18n.t('messages.errorOccurred'), 'error');
     }
 
     document.getElementById('guessInput').value = '';
@@ -368,43 +394,43 @@ async function showRanking(highlightId) {
 
     } catch (error) {
         console.error('Failed to fetch ranking:', error);
-        alert('無法獲取排行榜，請稍後再試。');
+        alert(i18n.t('messages.cannotGetRanking'));
     }
 }
 
 // 創建新的歷史表格
 function createNewHistoryTable(tableIndex) {
     const historyContainer = document.getElementById('historyContainer');
-    
+
     const tableContainer = document.createElement('div');
     tableContainer.className = 'history-table-container';
     tableContainer.id = `table-container-${tableIndex}`;
-    
+
     const tableTitle = document.createElement('h4');
     const startGuess = tableIndex * ROWS_PER_TABLE + 1;
     const endGuess = (tableIndex + 1) * ROWS_PER_TABLE;
-    tableTitle.textContent = `猜測 ${startGuess}-${endGuess}`;
-    
+    tableTitle.textContent = i18n.t('history.guessRange', { start: startGuess, end: endGuess });
+
     const table = document.createElement('table');
     table.className = 'historyTable';
     table.id = `historyTable-${tableIndex}`;
-    
+
     table.innerHTML = `
         <thead>
             <tr>
-                <th>猜測</th>
-                <th>結果</th>
-                <th>時間(秒)</th>
+                <th>${i18n.t('history.headerGuess')}</th>
+                <th>${i18n.t('history.headerResult')}</th>
+                <th>${i18n.t('history.headerTime')}</th>
             </tr>
         </thead>
         <tbody>
         </tbody>
     `;
-    
+
     tableContainer.appendChild(tableTitle);
     tableContainer.appendChild(table);
     historyContainer.appendChild(tableContainer);
-    
+
     return table;
 }
 
@@ -434,7 +460,7 @@ function addToHistory(guess, a, b, time) {
     const historyRow = document.createElement('tr');
 
     const symbols = getSymbolSettings();
-    const resultText = a === 4 ? '🎉 正確！' : `${a}${symbols.a}${b}${symbols.b}`;
+    const resultText = a === 4 ? `🎉 ${i18n.t('history.correct')}` : `${a}${symbols.a}${b}${symbols.b}`;
     const resultClass = a === 4 ? 'correct' : 'hint';
 
     historyRow.innerHTML = `
@@ -492,31 +518,31 @@ async function newGame() {
         isPaused = false;
         pausedTime = 0;
         lastPauseTime = 0;
-        document.getElementById('timer').textContent = '0 (輸入第一組數字後開始計時)';
+        document.getElementById('timer').textContent = `0 ${i18n.t('messages.waitingForFirstGuess')}`;
         updatePauseButton();
-        
+
         // 啟用輸入框
         document.getElementById('guessInput').disabled = false;
-        
+
         // Hide surrender button until first guess
         document.getElementById('surrenderButton').style.display = 'none';
 
     } catch (error) {
-        showMessage('無法開始新遊戲，請檢查後端服務是否啟動。', 'error');
+        showMessage(i18n.t('messages.cannotStartNewGame'), 'error');
     }
 }
 
 // 投降功能
 async function surrenderGame() {
     if (gameOver) return;
-    
+
     if (!currentGameId) {
-        showMessage('請先開始新遊戲。', 'error');
+        showMessage(i18n.t('messages.startNewGame'), 'error');
         return;
     }
-    
+
     // Confirm surrender
-    if (!confirm('確定要投降嗎？投降後將不會計入排名。')) {
+    if (!confirm(i18n.t('messages.confirmSurrender'))) {
         return;
     }
     
@@ -540,12 +566,12 @@ async function surrenderGame() {
         
         // Color code all previous guesses
         colorCodeGuesses(result.answer, result.history);
-        
+
         // Show the correct answer
-        showMessage(`正確答案是：${result.answer}。遊戲結束（未計入排名）。`, 'error');
-        
+        showMessage(i18n.t('messages.surrenderAnswer', { answer: result.answer }), 'error');
+
     } catch (error) {
-        showMessage('投降失敗，請稍後再試。', 'error');
+        showMessage(i18n.t('messages.surrenderFailed'), 'error');
         console.error('Surrender error:', error);
     }
 }
@@ -610,67 +636,80 @@ function colorCodeGuesses(answer, history) {
 // 開始計時器
 function startTimer() {
     if (timerStarted) return;
-    
+
     timerStarted = true;
     startTime = Date.now();
     pausedTime = 0;
-    
+
     timerInterval = setInterval(() => {
         if (!isPaused) {
-            const elapsedSeconds = Math.round((Date.now() - startTime - pausedTime) / 1000);
-            document.getElementById('timer').textContent = elapsedSeconds + ' 秒';
+            updateTimerDisplay();
         }
     }, 1000);
-    
+
     // 立即更新顯示
-    document.getElementById('timer').textContent = '0 秒';
-    
+    document.getElementById('timer').textContent = `0${i18n.t('messages.seconds')}`;
+
     // 啟用暫停按鈕
     updatePauseButton();
+}
+
+// 更新計時器顯示
+function updateTimerDisplay() {
+    if (!timerStarted) return;
+    const elapsedSeconds = Math.round((Date.now() - startTime - pausedTime) / 1000);
+    document.getElementById('timer').textContent = `${elapsedSeconds}${i18n.t('messages.seconds')}`;
 }
 
 // 切換暫停/恢復
 function togglePause() {
     if (!timerStarted) {
-        showMessage('請先開始遊戲並進行第一次猜測。', 'error');
+        showMessage(i18n.t('messages.startGameFirst'), 'error');
         return;
     }
-    
+
     if (gameOver) {
-        showMessage('遊戲已結束。', 'error');
+        showMessage(i18n.t('messages.gameEnded'), 'error');
         return;
     }
-    
+
     isPaused = !isPaused;
-    
+
     if (isPaused) {
         // 暫停：記錄暫停時間
         lastPauseTime = Date.now();
         document.getElementById('guessInput').disabled = true;
-        showMessage('⏸️ 遊戲已暫停', 'hint');
+        showMessage(`⏸️ ${i18n.t('messages.gamePaused')}`, 'hint');
     } else {
         // 恢復：累加暫停時間
         pausedTime += Date.now() - lastPauseTime;
         document.getElementById('guessInput').disabled = false;
-        showMessage('▶️ 遊戲已恢復', 'hint');
+        showMessage(`▶️ ${i18n.t('messages.gameResumed')}`, 'hint');
     }
-    
+
     updatePauseButton();
 }
 
 // 更新暫停按鈕的顯示狀態
 function updatePauseButton() {
     const pauseButton = document.getElementById('pauseButton');
+    const pauseButtonText = document.getElementById('pauseButtonText');
     if (!pauseButton) return;
-    
+
     if (isPaused) {
-        pauseButton.textContent = '▶️ 繼續';
+        if (pauseButtonText) {
+            pauseButtonText.textContent = i18n.t('game.resumeButton');
+        }
+        pauseButton.querySelector('.emoji-icon').textContent = '▶️';
         pauseButton.classList.add('paused');
     } else {
-        pauseButton.textContent = '⏸️ 暫停';
+        if (pauseButtonText) {
+            pauseButtonText.textContent = i18n.t('game.pauseButton');
+        }
+        pauseButton.querySelector('.emoji-icon').textContent = '⏸️';
         pauseButton.classList.remove('paused');
     }
-    
+
     // 如果計時器還沒開始，禁用按鈕
     pauseButton.disabled = !timerStarted || gameOver;
 }
@@ -685,26 +724,26 @@ document.getElementById('guessInput').addEventListener('keypress', function(e) {
 // Hint functionality
 async function showHint(position) {
     if (!currentGameId) {
-        showMessage('請先開始新遊戲。', 'error');
+        showMessage(i18n.t('messages.startNewGame'), 'error');
         return;
     }
-    
+
     if (gameOver) {
-        showMessage('遊戲已結束。', 'error');
+        showMessage(i18n.t('messages.gameEnded'), 'error');
         return;
     }
-    
+
     try {
         const response = await fetch(`${API_URL}/hint/${currentGameId}/${position}`);
-        
+
         if (!response.ok) {
             throw new Error('Failed to get hint');
         }
-        
+
         const result = await response.json();
         displayHint(result.position, result.digit);
     } catch (error) {
-        showMessage('無法獲取提示，請稍後再試。', 'error');
+        showMessage(i18n.t('messages.cannotGetHint'), 'error');
         console.error('Error getting hint:', error);
     }
 }
@@ -712,12 +751,12 @@ async function showHint(position) {
 function displayHint(position, digit) {
     const hintModal = document.getElementById('hint-modal');
     const hintDisplay = document.getElementById('hint-display');
-    
+
     hintDisplay.innerHTML = `
-        <p class="hint-position">第 ${position} 位數字</p>
+        <p class="hint-position">${i18n.t('hint.positionLabel', { position: position })}</p>
         <p class="hint-digit">${digit}</p>
     `;
-    
+
     hintModal.style.display = 'block';
 }
 
@@ -753,20 +792,20 @@ function showVictoryAnimation(guessCount, duration) {
     const overlay = document.createElement('div');
     overlay.className = 'victory-overlay';
     overlay.id = 'victory-overlay';
-    
+
     // Create content
     const content = document.createElement('div');
     content.className = 'victory-content';
     content.innerHTML = `
         <div class="trophy">🏆</div>
-        <h2>🎉 恭喜過關！ 🎉</h2>
+        <h2>🎉 ${i18n.t('victory.title')} 🎉</h2>
         <div class="victory-stats">
-            <p>玩家：${playerName}</p>
-            <p>猜測次數：${guessCount} 次</p>
-            <p>花費時間：${duration} 秒</p>
+            <p>${i18n.t('victory.playerLabel')}${playerName}</p>
+            <p>${i18n.t('victory.guessCountLabel')}${guessCount}${i18n.t('victory.guessCountSuffix')}</p>
+            <p>${i18n.t('victory.durationLabel')}${duration}${i18n.t('victory.durationSuffix')}</p>
         </div>
-        <button class="victory-button" onclick="closeVictoryAnimation()">查看排行榜</button>
-        <button class="victory-button" onclick="closeVictoryAndNewGame()">再來一局</button>
+        <button class="victory-button" onclick="closeVictoryAnimation()">${i18n.t('victory.viewRankingButton')}</button>
+        <button class="victory-button" onclick="closeVictoryAndNewGame()">${i18n.t('victory.playAgainButton')}</button>
     `;
     
     overlay.appendChild(content);
@@ -901,4 +940,40 @@ function applyTheme(theme) {
 function saveTheme(theme) {
     localStorage.setItem('guessNumberTheme', theme);
 }
+
+// ===== Compact Dropdown Functions =====
+function toggleDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    const isOpen = dropdown.classList.contains('open');
+
+    // Close all dropdowns first
+    closeAllDropdowns();
+
+    // Toggle the clicked dropdown
+    if (!isOpen) {
+        dropdown.classList.add('open');
+    }
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+}
+
+function selectLanguage(langCode) {
+    i18n.setLanguage(langCode);
+    closeAllDropdowns();
+}
+
+function selectTheme(theme) {
+    applyTheme(theme);
+    saveTheme(theme);
+    closeAllDropdowns();
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.dropdown')) {
+        closeAllDropdowns();
+    }
+});
 

@@ -1011,50 +1011,99 @@ button:disabled {
 }
 
 /* ===== 主題切換器樣式 ===== */
-.theme-switcher {
+/* ===== Compact Settings Bar ===== */
+.compact-settings {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
     margin-top: 20px;
     padding-top: 20px;
     border-top: 1px solid var(--border-color);
-    text-align: center;
-    transition: border-color 0.3s ease;
 }
 
-.theme-switcher h4 {
-    color: var(--primary-color);
-    margin-bottom: 15px;
-    font-size: 1.1em;
-    transition: color 0.3s ease;
+.dropdown {
+    position: relative;
+    display: inline-block;
 }
 
-.theme-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.theme-btn {
-    background: var(--container-bg);
-    color: var(--text-primary);
+.dropdown-toggle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
     border: 2px solid var(--border-color);
-    padding: 10px 20px;
-    font-size: 0.95em;
-    border-radius: 10px;
+    background: var(--container-bg);
+    font-size: 1.3em;
     cursor: pointer;
-    transition: all 0.3s ease;
-    min-width: 100px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.theme-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px var(--shadow-medium);
+.dropdown-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px var(--shadow-medium);
+    border-color: var(--primary-color);
 }
 
-.theme-btn.active {
+.dropdown.open .dropdown-toggle {
+    background: linear-gradient(135deg, var(--button-gradient-start) 0%, var(--button-gradient-end) 100%);
+    border-color: transparent;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.9);
+    background: var(--container-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 24px var(--shadow-medium);
+    padding: 8px;
+    min-width: 120px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    z-index: 1000;
+}
+
+.dropdown.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0.9em;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.dropdown-item:hover {
+    background: var(--secondary-bg);
+}
+
+.dropdown-item.active,
+.dropdown-item.lang-btn.active,
+.dropdown-item.theme-btn.active {
     background: linear-gradient(135deg, var(--button-gradient-start) 0%, var(--button-gradient-end) 100%);
     color: white;
-    border-color: transparent;
     font-weight: 600;
+}
+
+/* Legacy support - hide old switchers if still in DOM */
+.theme-switcher,
+.language-switcher {
+    display: none;
 }
 
 /* ===== 暗黑主題 ===== */
