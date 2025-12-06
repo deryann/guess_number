@@ -1057,6 +1057,53 @@ button:disabled {
     font-weight: 600;
 }
 
+/* ===== Language Switcher ===== */
+.language-switcher {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+.language-switcher h4 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.1em;
+    transition: color 0.3s ease;
+}
+
+.language-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.lang-btn {
+    background: var(--container-bg);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 8px 16px;
+    font-size: 0.9em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 90px;
+}
+
+.lang-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px var(--shadow-medium);
+}
+
+.lang-btn.active {
+    background: linear-gradient(135deg, var(--button-gradient-start) 0%, var(--button-gradient-end) 100%);
+    color: white;
+    border-color: transparent;
+    font-weight: 600;
+}
+
 /* ===== 暗黑主題 ===== */
 body.dark-theme {
     --bg-gradient-start: #1a1a2e;
