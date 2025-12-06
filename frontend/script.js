@@ -766,11 +766,14 @@ function closeHintModal() {
 }
 
 // Keyboard event listener for hint hotkeys
+// Use Alt/Option + 1-4 for cross-platform compatibility (works on both Windows and Mac)
 document.addEventListener('keydown', function(e) {
-    // Check if Ctrl key is pressed along with number keys 1-4
-    if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+    // Check if Alt/Option key is pressed along with number keys 1-4
+    if (e.altKey && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
         const key = e.key;
-        if (key >= '1' && key <= '4') {
+        // Handle both regular number keys and numpad keys
+        const numMatch = key.match(/^[1-4]$/);
+        if (numMatch) {
             e.preventDefault(); // Prevent default browser behavior
             const position = parseInt(key);
             showHint(position);
