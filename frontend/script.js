@@ -941,3 +941,39 @@ function saveTheme(theme) {
     localStorage.setItem('guessNumberTheme', theme);
 }
 
+// ===== Compact Dropdown Functions =====
+function toggleDropdown(dropdownId) {
+    const dropdown = document.getElementById(dropdownId);
+    const isOpen = dropdown.classList.contains('open');
+
+    // Close all dropdowns first
+    closeAllDropdowns();
+
+    // Toggle the clicked dropdown
+    if (!isOpen) {
+        dropdown.classList.add('open');
+    }
+}
+
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('open'));
+}
+
+function selectLanguage(langCode) {
+    i18n.setLanguage(langCode);
+    closeAllDropdowns();
+}
+
+function selectTheme(theme) {
+    applyTheme(theme);
+    saveTheme(theme);
+    closeAllDropdowns();
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.dropdown')) {
+        closeAllDropdowns();
+    }
+});
+

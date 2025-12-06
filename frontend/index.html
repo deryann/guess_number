@@ -25,22 +25,29 @@
         <button onclick="startGame()" data-i18n="startScreen.startButton">開始遊戲</button>
         <button id="homepage-ranking-button" onclick="showRanking()"><span class="emoji-icon">🏆</span> <span data-i18n="startScreen.rankingButton">查看排行榜</span></button>
 
-        <!-- Language Switcher -->
-        <div class="language-switcher">
-            <h4><span class="emoji-icon">🌐</span> <span data-i18n="language.title">語言</span></h4>
-            <div class="language-buttons">
-                <button class="lang-btn" data-lang="zh_tw" onclick="i18n.setLanguage('zh_tw')">繁體中文</button>
-                <button class="lang-btn" data-lang="en" onclick="i18n.setLanguage('en')">English</button>
+        <!-- Compact Settings Bar -->
+        <div class="compact-settings">
+            <!-- Language Dropdown -->
+            <div class="dropdown" id="lang-dropdown">
+                <button class="dropdown-toggle" onclick="toggleDropdown('lang-dropdown')" data-i18n-title="language.title" title="語言">
+                    🌐
+                </button>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item lang-btn" data-lang="zh_tw" onclick="selectLanguage('zh_tw')">繁體中文</button>
+                    <button class="dropdown-item lang-btn" data-lang="en" onclick="selectLanguage('en')">English</button>
+                </div>
             </div>
-        </div>
 
-        <!-- Theme Switcher -->
-        <div class="theme-switcher">
-            <h4><span class="emoji-icon">🎨</span> <span data-i18n="theme.title">主題切換</span></h4>
-            <div class="theme-buttons">
-                <button class="theme-btn active" data-theme="original" data-i18n="theme.original">原版模式</button>
-                <button class="theme-btn" data-theme="dark" data-i18n="theme.dark">暗黑模式</button>
-                <button class="theme-btn" data-theme="special" data-i18n="theme.special">特殊配色</button>
+            <!-- Theme Dropdown -->
+            <div class="dropdown" id="theme-dropdown">
+                <button class="dropdown-toggle" onclick="toggleDropdown('theme-dropdown')" data-i18n-title="theme.title" title="主題">
+                    🎨
+                </button>
+                <div class="dropdown-menu">
+                    <button class="dropdown-item theme-btn active" data-theme="original" onclick="selectTheme('original')" data-i18n="theme.original">原版模式</button>
+                    <button class="dropdown-item theme-btn" data-theme="dark" onclick="selectTheme('dark')" data-i18n="theme.dark">暗黑模式</button>
+                    <button class="dropdown-item theme-btn" data-theme="special" onclick="selectTheme('special')" data-i18n="theme.special">特殊配色</button>
+                </div>
             </div>
         </div>
 
