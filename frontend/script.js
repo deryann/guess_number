@@ -44,6 +44,7 @@ function saveSettings() {
     saveSymbolSettings(aSymbol, bSymbol);
     toggleSettingsModal(false);
     refreshHistoryDisplay();
+    updateRulesDisplay();
     showMessage('設定已儲存！', 'success');
 }
 
@@ -66,6 +67,26 @@ function refreshHistoryDisplay() {
         }
     });
 }
+
+function updateRulesDisplay() {
+    // 根據目前的符號設定更新遊戲規則說明
+    const symbols = getSymbolSettings();
+
+    // 更新所有 symbol-a 元素
+    document.querySelectorAll('.symbol-a').forEach(el => {
+        el.textContent = symbols.a;
+    });
+
+    // 更新所有 symbol-b 元素
+    document.querySelectorAll('.symbol-b').forEach(el => {
+        el.textContent = symbols.b;
+    });
+
+    // 更新所有 symbol-win 元素 (4A0B)
+    document.querySelectorAll('.symbol-win').forEach(el => {
+        el.textContent = `4${symbols.a}0${symbols.b}`;
+    });
+}
 let gameOver = false;
 let timerInterval;
 let startTime;
@@ -83,6 +104,7 @@ let lastPauseTime = 0;  // 最後一次暫停的時間點
 document.addEventListener('DOMContentLoaded', function() {
     loadVersionInfo();
     initializeTheme();
+    updateRulesDisplay();
 });
 
 async function loadVersionInfo() {
