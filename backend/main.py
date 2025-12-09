@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 from typing import Optional
 import secrets
-from database_setup import setup_database
+from database_setup import setup_database, DB_PATH
 
 app = FastAPI()
 
@@ -72,7 +72,7 @@ MAIN_VERSION = os.getenv("MAIN_VERSION", "dev")
 MINOR_VERSION = os.getenv("MINOR_VERSION", "dev")
 
 def get_db_connection():
-    conn = sqlite3.connect('ranking.db')
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 

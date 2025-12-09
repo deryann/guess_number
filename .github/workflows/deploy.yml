@@ -29,9 +29,18 @@ jobs:
             git pull origin main
             chmod +x start_build.sh
             ./start_build.sh
+
+            # Ensure data directory exists with proper permissions
+            sudo mkdir -p /opt/guess_number/data
+            sudo chown -R $(whoami):$(whoami) /opt/guess_number
+
             docker stop guess-number-game || true
             docker rm guess-number-game || true
-            docker run -d --name guess-number-game -p 12527:12527 guess-number-game:latest
+            docker run -d --name guess-number-game \
+              -p 12527:12527 \
+              -v /opt/guess_number/data:/app/data \
+              --restart unless-stopped \
+              guess-number-game:latest
           ENDSSH
 
       - name: Verify deployment

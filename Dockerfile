@@ -19,6 +19,9 @@ RUN pip install --no-cache-dir --user -r requirements.txt
 # Stage 2: Runtime stage
 FROM python:3.11-slim
 
+# Install sqlite3 for database integrity checks
+RUN apt-get update && apt-get install -y sqlite3 && rm -rf /var/lib/apt/lists/*
+
 # Set build arguments for versioning (need to redeclare in new stage)
 ARG BUILD_DATE=dev
 ARG GIT_HASH=dev
@@ -26,6 +29,9 @@ ARG GIT_HASH=dev
 # Set environment variables for versioning
 ENV MAIN_VERSION=${BUILD_DATE}
 ENV MINOR_VERSION=${GIT_HASH}
+
+# Set data directory environment variable
+ENV DATA_DIR=/app/data
 
 # Set working directory
 WORKDIR /app
@@ -42,14 +48,21 @@ COPY backend/ ./backend/
 # Copy frontend files to serve static content
 COPY frontend/ ./frontend/
 
+# Copy entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Create data directory (will be overridden by volume mount)
+RUN mkdir -p /app/data
+
 # Set working directory to backend for running the application
 WORKDIR /app/backend
 
-# Initialize the database
-RUN python database_setup.py
+# Declare volume for persistent data
+VOLUME ["/app/data"]
 
 # Expose port
 EXPOSE 12527
 
-# Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "12527"]
+# Use entrypoint script to handle initialization
+ENTRYPOINT ["/app/entrypoint.sh"]
