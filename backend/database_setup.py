@@ -1,8 +1,11 @@
 import sqlite3
+import os
 from pathlib import Path
 from typing import Optional
 
-DB_PATH = 'ranking.db'
+# Support external data directory via environment variable
+DATA_DIR = os.getenv('DATA_DIR', '/app/data')
+DB_PATH = os.path.join(DATA_DIR, 'ranking.db')
 
 
 def check_database_exists(db_path: str) -> bool:
@@ -97,14 +100,21 @@ def setup_database(db_path: str = DB_PATH) -> None:
     Setup the database by checking if it exists and creating necessary tables.
 
     This function:
-    1. Checks if the database file exists
-    2. Creates a connection (which creates the file if it doesn't exist)
-    3. Creates all required tables
-    4. Handles errors gracefully with proper cleanup
+    1. Ensures the data directory exists
+    2. Checks if the database file exists
+    3. Creates a connection (which creates the file if it doesn't exist)
+    4. Creates all required tables
+    5. Handles errors gracefully with proper cleanup
 
     Args:
-        db_path: Path to the database file (default: 'ranking.db')
+        db_path: Path to the database file (default uses DATA_DIR/ranking.db)
     """
+    # Ensure data directory exists
+    db_dir = Path(db_path).parent
+    if not db_dir.exists():
+        print(f"Creating data directory: {db_dir}")
+        db_dir.mkdir(parents=True, exist_ok=True)
+
     db_exists = check_database_exists(db_path)
 
     if not db_exists:

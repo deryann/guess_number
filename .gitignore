@@ -2,6 +2,12 @@ specs/
 backend/ranking.db
 ranking.db
 
+# Data directory (keep .gitkeep, ignore db files)
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

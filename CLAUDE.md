@@ -14,6 +14,11 @@ This is a classic 4A0B number guessing game with a Python FastAPI backend and va
 - UUID-based game session management
 - Version information from environment variables (`MAIN_VERSION`, `MINOR_VERSION`)
 
+**Data Persistence (`/data/`)**:
+- SQLite database stored in `/data/ranking.db` (mapped to external volume in production)
+- Container uses `/app/data` internally, mapped to `/opt/guess_number/data` on GCP VM
+- Environment variable `DATA_DIR` controls the data directory path
+
 **Frontend (`/frontend/`)**:
 - Vanilla JavaScript with dynamic API URL detection
 - Game state management with session-based tracking
@@ -47,8 +52,16 @@ uvicorn main:app --reload --port 12527
 chmod +x start_build.sh
 ./start_build.sh
 
-# Run container
+# Run container (development - no data persistence)
 docker run -p 12527:12527 guess-number-game:latest
+
+# Run container (production - with data persistence)
+mkdir -p /opt/guess_number/data
+docker run -d --name guess-number-game \
+  -p 12527:12527 \
+  -v /opt/guess_number/data:/app/data \
+  --restart unless-stopped \
+  guess-number-game:latest
 ```
 
 ### Testing
@@ -68,7 +81,9 @@ No automated tests are configured. Manual testing through the web interface.
 - `frontend/script.js`: Game state management and UI interactions
 - `backend/database_setup.py`: Database initialization script
 - `start_build.sh`: Docker build script with automatic versioning
-- `ranking.db`: SQLite database (created by setup script)
+- `entrypoint.sh`: Container entrypoint script handling initialization
+- `data/ranking.db`: SQLite database (created on first run, stored in external volume)
+- `.github/workflows/deploy.yml`: GitHub Actions deployment to GCP VM
 
 ## API Endpoints
 
